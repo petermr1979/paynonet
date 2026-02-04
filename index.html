@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Быстрое PWA приложение для управления картами">
+    <title>Заплати Без Сети</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Верхняя панель -->
+    <header class="top-bar">
+        <button class="user-button" aria-label="Профиль пользователя">
+            <span class="user-avatar">ПР</span>
+        </button>
+        <div class="logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="5" width="20" height="14" rx="2.5" fill="currentColor" opacity="0.15"/>
+                <rect x="4" y="7" width="16" height="10" rx="1.5" fill="currentColor" opacity="0.25"/>
+                <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+            </svg>
+        </div>
+        <button class="add-button" id="addCardBtn" aria-label="Добавить карту">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+        <!-- Вкладка Карты -->
+        <section class="tab-content active" id="cardsTab">
+            <!-- Миниатюры карт (верхняя часть) -->
+            <div class="cards-preview">
+                <div class="cards-scroll" id="cardsScroll">
+                    <!-- Карты будут добавлены динамически -->
+                </div>
+            </div>
+
+            <!-- Крупная карта (нижняя часть) -->
+            <div class="card-detail">
+                <div class="card-container" id="mainCardContainer">
+                    <div class="card-placeholder">
+                        <p>Добавьте карту для начала</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Вкладка История (заглушка) -->
+        <section class="tab-content" id="historyTab">
+            <div class="placeholder-content">
+                <p>История</p>
+                <p class="placeholder-subtitle">Скоро здесь появится история операций</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Нижняя навигация -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="cardsTab">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <line x1="3" y1="11" x2="21" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="8" cy="8" r="1" fill="currentColor"/>
+                <circle cx="12" cy="8" r="1" fill="currentColor"/>
+            </svg>
+            <span>Карты</span>
+        </button>
+        <button class="nav-item" data-tab="historyTab">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="5" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="3" y1="11" x2="21" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="8" y1="15" x2="16" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>История</span>
+        </button>
+    </nav>
+
+    <!-- Модальное окно добавления карты -->
+    <div class="modal-overlay" id="addCardModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Добавить карту</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="addCardForm" class="card-form">
+                <div class="form-group">
+                    <label for="cardNumber">Номер карты</label>
+                    <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cardExpiry">Срок действия</label>
+                        <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cardCVV">CVV</label>
+                        <input type="text" id="cardCVV" placeholder="123" maxlength="3" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="cardColor">Цвет карты</label>
+                    <div class="color-picker" id="colorPicker">
+                        <!-- Цвета будут добавлены динамически -->
+                    </div>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="makePrimary">
+                        <span>Сделать основной картой</span>
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelBtn">ОТМЕНА</button>
+                    <button type="submit" class="btn-primary" id="submitBtn" disabled>ОК</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Меню действий карты -->
+    <div class="action-menu" id="actionMenu">
+        <div class="action-menu-content">
+            <button class="action-item" id="setPrimaryBtn">Сделать основной</button>
+            <button class="action-item" id="removePrimaryBtn" style="display: none;">Убрать из основных</button>
+            <button class="action-item danger" id="deleteCardBtn">Удалить карту</button>
+            <button class="action-item" id="cancelActionBtn">Отмена</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
