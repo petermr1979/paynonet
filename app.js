@@ -495,7 +495,10 @@ function generateQRCode(card) {
   
   // Используем библиотеку QRCode если доступна, иначе создаём простую визуализацию
   if (typeof QRCode !== 'undefined') {
-    QRCode.toCanvas(qrContainer, qrString, {
+    // Создаём canvas элемент для QR-кода
+    const canvas = document.createElement('canvas');
+    
+    QRCode.toCanvas(canvas, qrString, {
       width: 200,
       margin: 2,
       color: {
@@ -506,6 +509,8 @@ function generateQRCode(card) {
       if (error) {
         console.error('Ошибка генерации QR-кода:', error);
         createSimpleQR(qrContainer, qrString);
+      } else {
+        qrContainer.appendChild(canvas);
       }
     });
   } else {
