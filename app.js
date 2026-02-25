@@ -399,36 +399,54 @@ function renderMainCard() {
   // Генерация QR-кода
   generateQRCode(card);
   
-  // Обработчики событий для переворота
-  let tapStartTime = 0;
-  let isLongPress = false;
+  // Обработчики событий для переворота и меню
+  let touchStartTime = 0;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let tapTimeout = null;
   
   cardElement.addEventListener('touchstart', (e) => {
-    tapStartTime = Date.now();
-    isLongPress = false;
+    touchStartTime = Date.now();
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    
+    // Устанавливаем таймер для долгого нажатия (500ms)
+    tapTimeout = setTimeout(() => {
+      showActionMenu(card.id);
+    }, 500);
   });
   
   cardElement.addEventListener('touchmove', () => {
-    isLongPress = true;
-  });
-  
-  cardElement.addEventListener('touchend', (e) => {
-    const tapDuration = Date.now() - tapStartTime;
-    
-    if (tapDuration >= 500) {
-      // Долгое удержание - меню действий
-      e.preventDefault();
-      showActionMenu(card.id);
-    } else if (!isLongPress && tapDuration < 500) {
-      // Короткое нажатие - переворот
-      toggleCardFlip();
+    // Если был тач-муув, отменяем долгое нажатие
+    if (tapTimeout) {
+      clearTimeout(tapTimeout);
+      tapTimeout = null;
     }
   });
   
+  cardElement.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const distX = Math.abs(touchEndX - touchStartX);
+    const distY = Math.abs(touchEndY - touchStartY);
+    const tapDuration = Date.now() - touchStartTime;
+    
+    // Отменяем таймер если он ещё активен
+    if (tapTimeout) {
+      clearTimeout(tapTimeout);
+      tapTimeout = null;
+      
+      // Если было короткое касание без движения - переворот
+      if (tapDuration < 500 && distX < 10 && distY < 10) {
+        toggleCardFlip();
+      }
+    }
+  });
+  
+  // Клик мышью для переворота
   cardElement.addEventListener('click', (e) => {
-    // Проверяем, не было ли это долгое нажатие
-    const clickDuration = Date.now() - tapStartTime;
-    if (clickDuration < 500) {
+    // Предотвращаем двойное срабатывание
+    if (e.detail === 1) { // только одиночный клик
       toggleCardFlip();
     }
   });
@@ -437,20 +455,6 @@ function renderMainCard() {
   cardElement.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     showActionMenu(card.id);
-  });
-  
-  // Обработка долгого нажатия мышью (для десктопа)
-  let mouseDownTime = 0;
-  cardElement.addEventListener('mousedown', () => {
-    mouseDownTime = Date.now();
-  });
-  
-  cardElement.addEventListener('mouseup', (e) => {
-    const duration = Date.now() - mouseDownTime;
-    if (duration >= 500) {
-      e.preventDefault();
-      showActionMenu(card.id);
-    }
   });
 }
 
@@ -498,21 +502,29 @@ function generateQRCode(card) {
     // Создаём canvas элемент для QR-кода
     const canvas = document.createElement('canvas');
     
-    QRCode.toCanvas(canvas, qrString, {
-      width: 200,
-      margin: 2,
-      color: {
-        dark: '#000000',
-        light: '#FFFFFF'
-      }
-    }, (error) => {
-      if (error) {
-        console.error('Ошибка генерации QR-кода:', error);
-        createSimpleQR(qrContainer, qrString);
-      } else {
-        qrContainer.appendChild(canvas);
-      }
-    });
+    try {
+      QRCode.toCanvas(canvas, qrString, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      }, (error) => {
+        if (error) {
+          console.error('Ошибка генерации QR-кода:', error);
+          createSimpleQR(qrContainer, qrString);
+        } else {
+          // canvas уже добавлен автоматически
+          if (!canvas.parentElement) {
+            qrContainer.appendChild(canvas);
+          }
+        }
+      });
+    } catch (e) {
+      console.error('Ошибка при генерации QR:', e);
+      createSimpleQR(qrContainer, qrString);
+    }
   } else {
     createSimpleQR(qrContainer, qrString);
   }
