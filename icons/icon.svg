@@ -1,0 +1,46 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0a0a1a"/>
+            <stop offset="100%" style="stop-color:#1a1a3e"/>
+        </linearGradient>
+        <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#00d4ff"/>
+            <stop offset="100%" style="stop-color:#7b2fff"/>
+        </linearGradient>
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="512" height="512" rx="100" fill="url(#bgGradient)"/>
+    
+    <!-- Card shape -->
+    <rect x="106" y="180" width="300" height="190" rx="20" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+    
+    <!-- NFC waves -->
+    <path d="M 320 275 Q 360 275 380 275" stroke="url(#accentGradient)" stroke-width="4" fill="none" filter="url(#glow)" opacity="0.8">
+        <animate attributeName="d" values="M 320 275 Q 360 275 380 275;M 320 275 Q 370 265 400 275;M 320 275 Q 360 275 380 275" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M 320 275 Q 370 275 400 275" stroke="url(#accentGradient)" stroke-width="4" fill="none" filter="url(#glow)" opacity="0.6">
+        <animate attributeName="d" values="M 320 275 Q 370 275 400 275;M 320 275 Q 380 265 420 275;M 320 275 Q 370 275 400 275" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+    </path>
+    <path d="M 320 275 Q 380 275 420 275" stroke="url(#accentGradient)" stroke-width="4" fill="none" filter="url(#glow)" opacity="0.4">
+        <animate attributeName="d" values="M 320 275 Q 380 275 420 275;M 320 275 Q 390 265 440 275;M 320 275 Q 380 275 420 275" dur="2s" repeatCount="indefinite" begin="0.6s"/>
+    </path>
+    
+    <!-- PNN Text -->
+    <text x="256" y="140" text-anchor="middle" fill="url(#accentGradient)" font-size="48" font-weight="bold" font-family="-apple-system, BlinkMacSystemFont, sans-serif" filter="url(#glow)">PNN</text>
+    
+    <!-- Chip -->
+    <rect x="136" y="220" width="50" height="35" rx="6" fill="#d4af37" opacity="0.8"/>
+    
+    <!-- Card number lines -->
+    <rect x="136" y="280" width="200" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
+    <rect x="136" y="295" width="150" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+</svg>
