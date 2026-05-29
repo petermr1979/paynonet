@@ -5,235 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="PNN">
     <meta name="theme-color" content="#0a0a1a">
-    <meta name="description" content="PNN - Платежи без сети">
+    <meta name="apple-mobile-web-app-title" content="PNN">
+    <title>PNN - Заплати Без Сети</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon-180.png">
-    <link rel="stylesheet" href="styles/main.css">
-    <title>PNN - Платежи без сети</title>
+    <link rel="apple-touch-icon" href="assets/icons/icon-180.png">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <div id="app">
-        <!-- Основной экран -->
-        <main id="main-screen" class="screen active">
-            <!-- Верхняя панель -->
-            <header class="top-bar glass">
-                <div class="avatar-container" id="avatar-btn">
-                    <div class="avatar" id="user-avatar">
-                        <span class="avatar-initials">ПМ</span>
-                    </div>
-                </div>
-                <div class="logo-container">
-                    <svg class="app-logo" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#00d4ff"/>
-                                <stop offset="100%" style="stop-color:#7b2fff"/>
-                            </linearGradient>
-                        </defs>
-                        <text x="60" y="28" text-anchor="middle" fill="url(#logoGradient)" font-size="24" font-weight="bold" font-family="-apple-system, BlinkMacSystemFont, sans-serif">PNN</text>
-                    </svg>
-                </div>
-                <div class="add-card-btn" id="add-card-btn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-            </header>
+        <!-- Верхняя панель -->
+        <header class="top-bar">
+            <div class="avatar" id="avatar">
+                <span id="avatar-initials">ПМ</span>
+            </div>
+            <div class="logo">
+                <svg viewBox="0 0 120 40" class="logo-svg">
+                    <defs>
+                        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <text x="60" y="28" text-anchor="middle" fill="url(#logoGradient)" font-size="24" font-weight="bold" font-family="-apple-system, BlinkMacSystemFont, sans-serif">PNN</text>
+                </svg>
+            </div>
+            <button class="add-btn" id="addCardBtn">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+            </button>
+        </header>
 
-            <!-- Центральная область с каруселью карт -->
-            <div class="cards-container" id="cards-container">
-                <div class="cards-carousel" id="cards-carousel">
+        <!-- Основная область с каруселью карт -->
+        <main class="main-content">
+            <div class="cards-carousel" id="cardsCarousel">
+                <div class="cards-container" id="cardsContainer">
                     <!-- Карты будут добавлены через JS -->
                 </div>
             </div>
-
-            <!-- Нижняя панель навигации -->
-            <nav class="tab-bar glass">
-                <div class="tab-item active" data-tab="main">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>Главная</span>
-                </div>
-                <div class="tab-item" data-tab="history">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
-                        <path d="M12 7V12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>История</span>
-                </div>
-            </nav>
         </main>
 
-        <!-- Экран истории (заглушка) -->
-        <main id="history-screen" class="screen">
-            <header class="top-bar glass">
-                <div class="logo-container">
-                    <svg class="app-logo" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
-                        <text x="60" y="28" text-anchor="middle" fill="url(#logoGradient)" font-size="24" font-weight="bold" font-family="-apple-system, BlinkMacSystemFont, sans-serif">История</text>
-                    </svg>
-                </div>
-            </header>
-            <div class="empty-state">
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-                    <path d="M12 7V12L15 15" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Нижняя панель навигации -->
+        <nav class="tab-bar">
+            <button class="tab-btn active" data-tab="home">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                 </svg>
-                <p>История операций пуста</p>
-            </div>
-            <nav class="tab-bar glass">
-                <div class="tab-item" data-tab="main">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>Главная</span>
-                </div>
-                <div class="tab-item active" data-tab="history">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
-                        <path d="M12 7V12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>История</span>
-                </div>
-            </nav>
-        </main>
-
-        <!-- Экран передачи токена (гиперпространство) -->
-        <div id="warp-screen" class="warp-screen">
-            <div class="warp-background" id="warp-bg">
-                <canvas id="warp-canvas"></canvas>
-            </div>
-            <div class="warp-content">
-                <div class="transfer-icon">
-                    <div class="pulse-ring"></div>
-                    <div class="pulse-ring"></div>
-                    <div class="pulse-ring"></div>
-                    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="40" cy="40" r="30" stroke="url(#transferGradient)" stroke-width="3" fill="none">
-                            <animate attributeName="stroke-dasharray" from="0 188.5" to="188.5 0" dur="1.5s" repeatCount="indefinite"/>
-                        </circle>
-                        <defs>
-                            <linearGradient id="transferGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#00d4ff"/>
-                                <stop offset="100%" style="stop-color:#7b2fff"/>
-                            </linearGradient>
-                        </defs>
-                        <path d="M40 25V40L50 50" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <p class="transfer-text">Передача токена…</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="transfer-progress"></div>
-                </div>
-            </div>
-        </div>
+                <span>Главная</span>
+            </button>
+            <button class="tab-btn" data-tab="history">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                </svg>
+                <span>История</span>
+            </button>
+        </nav>
 
         <!-- Модальное окно добавления карты -->
-        <div id="add-card-modal" class="modal add-card-modal">
-            <div class="modal-overlay"></div>
-            <div class="modal-content add-card-content glass">
-                <!-- Карта в верхней части -->
-                <div class="add-card-preview">
-                    <div class="preview-card payment-card glass active">
-                        <div class="card-content">
-                            <div class="card-header">
-                                <div class="card-logo">
-                                    <span class="mir-logo" id="preview-mir">МИР</span>
-                                </div>
-                                <div class="card-chip"></div>
-                            </div>
-                            <div class="card-number" id="preview-number">•••• •••• •••• 0000</div>
-                            <div class="card-footer">
-                                <div>
-                                    <div class="card-label">Cardholder</div>
-                                    <div class="cardholder-name" id="preview-cardholder">IVAN IVANOV</div>
-                                </div>
-                                <div>
-                                    <div class="card-label">Expires</div>
-                                    <div class="card-expiry" id="preview-expiry">ММ/ГГ</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Кнопка звезды -->
-                    <button class="star-btn" id="star-btn" type="button">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal-card" id="modalCard">
+                <div class="modal-header">
+                    <h2>Добавить карту</h2>
+                    <button class="star-btn" id="starBtn">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                         </svg>
                     </button>
                 </div>
-                
-                <!-- Форма ввода -->
-                <form id="add-card-form">
+                <form id="addCardForm">
                     <div class="form-group">
-                        <label for="card-number">Номер карты</label>
-                        <input type="text" id="card-number" placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric" autocomplete="cc-number" required>
+                        <label for="cardNumber">Номер карты</label>
+                        <input type="tel" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="23" autocomplete="cc-number">
+                        <span class="error-msg" id="cardNumberError">Карта должна быть платёжной системы "Мир"</span>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="expiry-date">Срок действия</label>
-                            <input type="text" id="expiry-date" placeholder="ММ/ГГ" maxlength="5" inputmode="numeric" autocomplete="cc-exp" required>
+                            <label for="expiryDate">Срок действия</label>
+                            <input type="tel" id="expiryDate" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp">
                         </div>
                         <div class="form-group">
-                            <label for="cvv">CVV/CVC</label>
-                            <input type="password" id="cvv" placeholder="123" maxlength="3" inputmode="numeric" autocomplete="cc-csc" required>
+                            <label for="cvv">CVV</label>
+                            <input type="tel" id="cvv" placeholder="123" maxlength="3" autocomplete="cc-csc">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="cardholder-name">Имя держателя</label>
-                        <input type="text" id="cardholder-name" placeholder="IVAN IVANOV" maxlength="26" autocomplete="cc-name" required>
-                    </div>
-                    
-                    <!-- Кнопки ОК и Отмена -->
-                    <div class="add-card-actions">
-                        <button type="button" class="cancel-btn" id="cancel-btn">Отмена</button>
-                        <button type="submit" class="ok-btn">ОК</button>
+                        <label for="cardholderName">Имя держателя</label>
+                        <input type="text" id="cardholderName" placeholder="IVAN IVANOV" maxlength="26" autocomplete="cc-name">
                     </div>
                 </form>
+                <div class="modal-actions">
+                    <button class="btn-cancel" id="cancelBtn">Отмена</button>
+                    <button class="btn-ok" id="okBtn" disabled>OK</button>
+                </div>
             </div>
         </div>
 
-        <!-- Модальное окно личного кабинета (заглушка) -->
-        <div id="profile-modal" class="modal">
-            <div class="modal-overlay"></div>
-            <div class="modal-content glass">
-                <div class="modal-header">
-                    <h2>Личный кабинет</h2>
-                    <button class="close-btn" id="close-profile-btn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18 6L6 18M6 6L18 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
+        <!-- Экран передачи токена (гиперпространство) -->
+        <div class="hyperspace-overlay" id="hyperspaceOverlay">
+            <div class="stars" id="stars"></div>
+            <div class="transfer-content">
+                <div class="pulse-ring"></div>
+                <div class="transfer-icon">
+                    <svg viewBox="0 0 24 24" width="48" height="48">
+                        <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
                 </div>
-                <div class="profile-content">
-                    <div class="profile-avatar-large" id="profile-avatar-large">
-                        <span class="avatar-initials">ПМ</span>
-                    </div>
-                    <p class="profile-name">Пользователь</p>
-                    <p class="profile-email">user@example.com</p>
-                    <div class="profile-stats">
-                        <div class="stat-item">
-                            <span class="stat-value">3</span>
-                            <span class="stat-label">Карты</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value">0</span>
-                            <span class="stat-label">Транзакции</span>
-                        </div>
-                    </div>
-                    <p class="profile-note">Функционал в разработке</p>
-                </div>
+                <p class="transfer-text">Передача токена…</p>
             </div>
         </div>
     </div>
 
-    <script src="js/app.js" defer></script>
-    <script src="js/warp-animation.js" defer></script>
-    <script src="js/storage.js" defer></script>
-    <script src="js/sw-register.js" defer></script>
+    <script src="js/storage.js"></script>
+    <script src="js/ble.js"></script>
+    <script src="js/animation.js"></script>
+    <script src="js/cards.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
