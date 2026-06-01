@@ -1,10 +1,30 @@
-<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="100" fill="url(#iconGrad)"/>
-  <text x="256" y="320" text-anchor="middle" fill="white" font-size="200" font-weight="bold" font-family="-apple-system, BlinkMacSystemFont, sans-serif">P</text>
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="appIconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+        </linearGradient>
+        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+            <feOffset dx="0" dy="4" result="offsetblur"/>
+            <feComponentTransfer>
+                <feFuncA type="linear" slope="0.3"/>
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="180" height="180" rx="40" fill="url(#appIconGradient)"/>
+    
+    <!-- Logo Pattern -->
+    <g filter="url(#shadow)">
+        <path d="M52 105L75 105L82 82L90 105L98 82L105 105L128 105L128 120L112 120L105 142L98 120L90 142L82 120L75 142L68 120L52 120V105Z" fill="white"/>
+    </g>
+    
+    <!-- Shine effect -->
+    <ellipse cx="60" cy="50" rx="30" ry="20" fill="white" fill-opacity="0.1" transform="rotate(-45 60 50)"/>
 </svg>

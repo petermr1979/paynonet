@@ -1,0 +1,30 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="appIconGradient192" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+        </linearGradient>
+        <filter id="shadow192" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+            <feOffset dx="0" dy="5" result="offsetblur"/>
+            <feComponentTransfer>
+                <feFuncA type="linear" slope="0.3"/>
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="192" height="192" rx="43" fill="url(#appIconGradient192)"/>
+    
+    <!-- Logo Pattern -->
+    <g filter="url(#shadow192)">
+        <path d="M56 112L84 112L92 88L100 112L108 88L116 112L144 112L144 128L124 128L116 152L108 128L100 152L92 128L84 152L76 128L56 128V112Z" fill="white"/>
+    </g>
+    
+    <!-- Shine effect -->
+    <ellipse cx="65" cy="54" rx="32" ry="21" fill="white" fill-opacity="0.1" transform="rotate(-45 65 54)"/>
+</svg>

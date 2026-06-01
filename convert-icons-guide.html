@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNN Wallet - Конвертер иконок</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemSystemFont, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f7;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        p {
+            color: #8e8e93;
+            line-height: 1.5;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 8px 0;
+        }
+        .icon-preview {
+            display: flex;
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .icon-item {
+            text-align: center;
+        }
+        .icon-item svg {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .icon-item span {
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #8e8e93;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        ol {
+            line-height: 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🎨 Конвертация иконок</h1>
+        <p>Для работы PWA необходимы PNG иконки. Выберите удобный способ конвертации.</p>
+        
+        <div class="icon-preview">
+            <div class="icon-item">
+                <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="180" height="180" rx="40" fill="url(#g1)"/>
+                    <path d="M52 105L75 105L82 82L90 105L98 82L105 105L128 105L128 120L112 120L105 142L98 120L90 142L82 120L75 142L68 120L52 120V105Z" fill="white"/>
+                </svg>
+                <span>180×180<br>Apple Touch</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="192" height="192" rx="43" fill="url(#g2)"/>
+                    <path d="M56 112L84 112L92 88L100 112L108 88L116 112L144 112L144 128L124 128L116 152L108 128L100 152L92 128L84 152L76 128L56 128V112Z" fill="white"/>
+                </svg>
+                <span>192×192<br>PWA</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="512" height="512" rx="114" fill="url(#g3)"/>
+                    <path d="M148 298L214 298L234 234L256 298L278 234L298 298L364 298L364 340L318 340L298 404L278 340L256 404L234 340L214 404L194 340L148 340V298Z" fill="white"/>
+                </svg>
+                <span>512×512<br>PWA</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>Способ 1: Онлайн-конвертеры (рекомендуется)</h2>
+        <ol>
+            <li>Откройте <a href="https://svgtopng.com/" target="_blank">svgtopng.com</a></li>
+            <li>Загрузите файл <code>assets/icons/icon.svg</code></li>
+            <li>Укажите размер <strong>180×180</strong></li>
+            <li>Скачайте как <code>apple-touch-icon.png</code></li>
+            <li>Повторите для других размеров</li>
+        </ol>
+        <p><strong>Полезные сервисы:</strong></p>
+        <p>
+            <a href="https://svgtopng.com/" class="btn" target="_blank">SVG to PNG</a>
+            <a href="https://cloudconvert.com/svg-to-png" class="btn" target="_blank">CloudConvert</a>
+            <a href="https://realfavicongenerator.net/" class="btn" target="_blank">Favicon Generator</a>
+        </p>
+    </div>
+    
+    <div class="card">
+        <h2>Способ 2: ImageMagick (локально)</h2>
+        <p>Установите ImageMagick и запустите скрипт:</p>
+        <pre><code>brew install imagemagick
+./convert-icons.sh</code></pre>
+    </div>
+    
+    <div class="card">
+        <h2>Способ 3: Figma / Sketch</h2>
+        <ol>
+            <li>Импортируйте SVG файл в Figma</li>
+            <li>Создайте фреймы 180×180, 192×192, 512×512</li>
+            <li>Экспортируйте как PNG</li>
+        </ol>
+    </div>
+    
+    <div class="card">
+        <h2>📁 Куда сохранить файлы</h2>
+        <p>Поместите PNG файлы в папку <code>assets/icons/</code>:</p>
+        <ul>
+            <li><code>apple-touch-icon.png</code> (180×180)</li>
+            <li><code>icon-192.png</code> (192×192)</li>
+            <li><code>icon-512.png</code> (512×512)</li>
+        </ul>
+    </div>
+</body>
+</html>

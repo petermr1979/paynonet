@@ -1,0 +1,30 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="appIconGradient512" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+        </linearGradient>
+        <filter id="shadow512" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+            <feOffset dx="0" dy="12" result="offsetblur"/>
+            <feComponentTransfer>
+                <feFuncA type="linear" slope="0.3"/>
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="512" height="512" rx="114" fill="url(#appIconGradient512)"/>
+    
+    <!-- Logo Pattern -->
+    <g filter="url(#shadow512)">
+        <path d="M148 298L214 298L234 234L256 298L278 234L298 298L364 298L364 340L318 340L298 404L278 340L256 404L234 340L214 404L194 340L148 340V298Z" fill="white"/>
+    </g>
+    
+    <!-- Shine effect -->
+    <ellipse cx="172" cy="144" rx="86" ry="57" fill="white" fill-opacity="0.1" transform="rotate(-45 172 144)"/>
+</svg>

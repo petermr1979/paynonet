@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор иконок PNN Wallet</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f7;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+        p {
+            color: #8e8e93;
+            margin-bottom: 32px;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        .icon-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.15s;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 12px;
+            background: white;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Генератор иконок</h1>
+        <p>Нажмите кнопку, чтобы скачать PNG иконки для PWA</p>
+        
+        <div class="icon-grid">
+            <div class="icon-card">
+                <canvas id="canvas180" width="180" height="180"></canvas>
+                <div>180×180</div>
+                <div style="font-size: 12px; color: #8e8e93;">Apple Touch Icon</div>
+            </div>
+            <div class="icon-card">
+                <canvas id="canvas192" width="192" height="192"></canvas>
+                <div>192×192</div>
+                <div style="font-size: 12px; color: #8e8e93;">PWA Icon</div>
+            </div>
+            <div class="icon-card">
+                <canvas id="canvas512" width="512" height="512"></canvas>
+                <div>512×512</div>
+                <div style="font-size: 12px; color: #8e8e93;">PWA Icon</div>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="downloadAll()">📥 Скачать все иконки</button>
+        
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        // Функция для рисования иконки
+        function drawIcon(canvas) {
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+            
+            // Градиентный фон
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            
+            // Закруглённый квадрат
+            const radius = size * 0.22;
+            ctx.fillStyle = gradient;
+            roundRect(ctx, 0, 0, size, size, radius);
+            ctx.fill();
+            
+            // Логотип (белый)
+            ctx.fillStyle = 'white';
+            const logoSize = size * 0.5;
+            const logoX = (size - logoSize) / 2;
+            const logoY = (size - logoSize) / 2 + logoSize * 0.1;
+            
+            // Рисуем логотип
+            drawLogo(ctx, logoX, logoY, logoSize);
+            
+            // Блик
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.beginPath();
+            ctx.ellipse(size * 0.35, size * 0.3, size * 0.15, size * 0.1, -Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Функция для рисования закруглённого прямоугольника
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+        
+        // Функция для рисования логотипа
+        function drawLogo(ctx, x, y, size) {
+            const points = [
+                {x: 0.1, y: 0.5}, {x: 0.35, y: 0.5}, {x: 0.42, y: 0.28},
+                {x: 0.5, y: 0.5}, {x: 0.58, y: 0.28}, {x: 0.65, y: 0.5},
+                {x: 0.9, y: 0.5}, {x: 0.9, y: 0.65}, {x: 0.72, y: 0.65},
+                {x: 0.65, y: 0.88}, {x: 0.58, y: 0.65}, {x: 0.5, y: 0.88},
+                {x: 0.42, y: 0.65}, {x: 0.35, y: 0.88}, {x: 0.28, y: 0.65},
+                {x: 0.1, y: 0.65}
+            ];
+            
+            ctx.beginPath();
+            ctx.moveTo(x + points[0].x * size, y + points[0].y * size);
+            
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(x + points[i].x * size, y + points[i].y * size);
+            }
+            
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // Инициализация канвасов
+        function init() {
+            const canvases = ['canvas180', 'canvas192', 'canvas512'];
+            canvases.forEach(id => {
+                const canvas = document.getElementById(id);
+                drawIcon(canvas);
+            });
+        }
+        
+        // Скачивание всех иконок
+        function downloadAll() {
+            const downloads = [
+                { canvas: 'canvas180', name: 'apple-touch-icon.png' },
+                { canvas: 'canvas192', name: 'icon-192.png' },
+                { canvas: 'canvas512', name: 'icon-512.png' }
+            ];
+            
+            let completed = 0;
+            const status = document.getElementById('status');
+            
+            downloads.forEach((item, index) => {
+                setTimeout(() => {
+                    const canvas = document.getElementById(item.canvas);
+                    const link = document.createElement('a');
+                    link.download = item.name;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    completed++;
+                    if (completed === downloads.length) {
+                        status.textContent = '✅ Все иконки скачаны! Сохраните их в папку assets/icons/';
+                        status.className = 'status success';
+                        status.style.display = 'block';
+                    }
+                }, index * 300);
+            });
+            
+            status.textContent = '⏳ Скачивание...';
+            status.className = 'status';
+            status.style.display = 'block';
+        }
+        
+        // Запуск при загрузке
+        init();
+    </script>
+</body>
+</html>
