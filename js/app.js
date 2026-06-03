@@ -54,6 +54,9 @@ class App {
     // Показываем пустое состояние (карт нет)
     this.renderEmptyState();
     
+    // Скрываем большую карту
+    this.hideBigCard();
+    
     console.log('PNN Wallet initialized');
   }
 
@@ -88,9 +91,13 @@ class App {
    */
   initEventListeners() {
     // Кнопка добавления карты
-    this.elements.addCardBtn.addEventListener('click', () => {
+    this.elements.addCardBtn.addEventListener('click', (e) => {
+      console.log('Add card button clicked!', e);
       this.cardForm.show();
     });
+    
+    // Отладка: проверка что кнопка существует
+    console.log('Add button element:', this.elements.addCardBtn);
 
     // Кнопка профиля (заглушка)
     this.elements.profileBtn.addEventListener('click', () => {
@@ -248,9 +255,10 @@ class App {
       isMain
     });
 
-    // Если это первая карта, убираем пустое состояние
+    // Если это первая карта, убираем пустое состояние и показываем большую карту
     if (this.cardManager.cards.length === 1) {
       document.getElementById('cardsGrid').innerHTML = '';
+      this.showBigCard();
     }
 
     // Рендерим карту в верхней сетке
@@ -403,6 +411,28 @@ class App {
         <div class="cards-empty-hint">Нажмите + чтобы добавить карту</div>
       </div>
     `;
+  }
+
+  /**
+   * Показывает большую карту
+   */
+  showBigCard() {
+    const bigCardSection = document.getElementById('bigCardSection');
+    if (bigCardSection) {
+      bigCardSection.classList.remove('hidden');
+      bigCardSection.classList.add('visible');
+    }
+  }
+
+  /**
+   * Скрывает большую карту
+   */
+  hideBigCard() {
+    const bigCardSection = document.getElementById('bigCardSection');
+    if (bigCardSection) {
+      bigCardSection.classList.remove('visible');
+      bigCardSection.classList.add('hidden');
+    }
   }
 
   /**

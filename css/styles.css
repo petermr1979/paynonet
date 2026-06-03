@@ -78,10 +78,12 @@ body {
   border-bottom: 0.5px solid var(--ios-separator);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .header-btn {
+  position: relative;
+  z-index: 1001;
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -221,10 +223,30 @@ body {
 }
 
 /* ===================================
-   Big Card - пропорции банковской карты
+   Big Card - пропорции банковской карты (фиксированная)
    =================================== */
 .big-card-section {
-  margin-top: 12px;
+  position: fixed;
+  bottom: calc(76px + var(--safe-area-bottom));
+  left: 16px;
+  right: 16px;
+  z-index: 50;
+  margin-top: 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s var(--transition-smooth),
+              transform 0.3s var(--transition-smooth);
+  pointer-events: none;
+}
+
+.big-card-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.big-card-section.hidden {
+  display: none;
 }
 
 .big-card-container {
@@ -396,7 +418,6 @@ body {
 
 .tab-btn.active {
   color: var(--ios-primary);
-  background: rgba(0, 122, 255, 0.1);
 }
 
 .tab-btn:active {
