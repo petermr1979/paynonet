@@ -261,11 +261,11 @@ class App {
       this.showBigCard();
     }
 
-    // Рендерим карту в верхней сетке
+    // Рендерим карту в верхней сетке (всегда добавляем)
     this.cardRenderer.addCard(card);
 
-    // Обновляем большую карту внизу (последняя добавленная или основная)
-    this.updateBigCard(card);
+    // Обновляем большую карту внизу (основная или последняя добавленная)
+    this.updateBigCard();
 
     // Показываем индикатор загрузки
     await LoadingAnimations.show(this.elements.loadingOverlay);
@@ -280,12 +280,16 @@ class App {
   }
 
   /**
-   * Обновляет большую карту внизу
-   * @param {Object} card - Данные карты
+   * Обновляет большую карту внизу (основная или последняя добавленная)
    */
-  updateBigCard(card) {
+  updateBigCard() {
     const bigCard = this.elements.bigCard;
     const content = bigCard.querySelector('.big-card-content');
+    
+    // Получаем основную карту или последнюю добавленную
+    const card = this.cardManager.getMainCard() || this.cardManager.cards[this.cardManager.cards.length - 1];
+    
+    if (!card) return;
     
     // Определяем цвет карты для градиента
     const gradients = {
@@ -304,22 +308,17 @@ class App {
     const maskedNumber = this.maskCardNumberBig(card.number);
     content.querySelector('.big-card-number').textContent = maskedNumber;
     
-    // Добавляем звезду если карта основная
-    let starHTML = '';
-    if (card.isMain) {
-      starHTML = `
-        <svg class="star" style="position: absolute; top: 20px; right: 20px; width: 28px; height: 28px; color: rgba(255, 255, 255, 0.9);" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-        </svg>
-      `;
-    }
-    
     // Удаляем старую звезду если есть
     const oldStar = content.querySelector('.star');
     if (oldStar) oldStar.remove();
     
-    // Добавляем новую звезду
-    if (starHTML) {
+    // Добавляем звезду если карта основная
+    if (card.isMain) {
+      const starHTML = `
+        <svg class="star" style="position: absolute; top: 20px; right: 20px; width: 28px; height: 28px; color: rgba(255, 255, 255, 0.9);" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+      `;
       content.insertAdjacentHTML('afterbegin', starHTML);
     }
   }
