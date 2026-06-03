@@ -348,16 +348,25 @@ class App {
   }
 
   /**
-   * Переключение вкладок
+   * Переключение вкладок с эффектом стекла
    * @param {HTMLElement} tab - Элемент вкладки
    */
   handleTabSwitch(tab) {
     const tabName = tab.getAttribute('data-tab');
+    const tabBar = document.querySelector('.tab-bar');
 
-    // Обновляем активный класс
+    // Добавляем эффект стекла при переключении
+    tabBar.classList.add('transitioning');
+
+    // Обновляем активный класс с небольшой задержкой для эффекта
     this.elements.tabBtns.forEach(btn => {
       btn.classList.toggle('active', btn === tab);
     });
+
+    // Убираем эффект стекла после анимации
+    setTimeout(() => {
+      tabBar.classList.remove('transitioning');
+    }, 300);
 
     console.log('Tab switched:', tabName);
 
@@ -454,9 +463,36 @@ class App {
     // Предотвращаем зум при фокусе на input
     document.addEventListener('focusin', (e) => {
       if (e.target.tagName === 'INPUT') {
+        // Используем visualViewport для iOS
+        if (window.visualViewport) {
+          setTimeout(() => {
+            const viewportHeight = window.visualViewport.height;
+            const keyboardHeight = window.innerHeight - viewportHeight;
+            
+            // Если клавиатура открылась
+            if (keyboardHeight > 100) {
+              const fieldRect = e.target.getBoundingClientRect();
+              
+              // Если поле слишком низко
+              if (fieldRect.bottom > viewportHeight - 50) {
+                const scrollOffset = fieldRect.bottom - viewportHeight + 100;
+                window.scrollBy({
+                  top: scrollOffset,
+                  behavior: 'smooth'
+                });
+              }
+            }
+          }, 150);
+        }
+      }
+    });
+
+    // Восстанавливаем высоту при потере фокуса
+    document.addEventListener('focusout', (e) => {
+      if (e.target.tagName === 'INPUT') {
         setTimeout(() => {
           window.scrollTo(0, 0);
-        }, 100);
+        }, 300);
       }
     });
   }

@@ -160,7 +160,7 @@ export class CardForm {
    * Инициализация обработчиков событий
    */
   init() {
-    // Форматирование номера карты
+    // Форматирование номера карты с автопереходом и скроллом
     this.elements.cardNumber.addEventListener('input', (e) => {
       const formatted = formatCardNumber(e.target.value);
       e.target.value = formatted;
@@ -168,11 +168,16 @@ export class CardForm {
       
       // Автопереход к следующему полю при заполнении
       if (formatted.replace(/\s/g, '').length >= 16) {
-        this.elements.expiryDate.focus();
+        this.scrollToField(this.elements.expiryDate);
       }
     });
 
-    // Форматирование срока действия
+    // Фокус на поле номера карты - скролл к полю
+    this.elements.cardNumber.addEventListener('focus', (e) => {
+      this.scrollToField(e.target);
+    });
+
+    // Форматирование срока действия с автопереходом и скроллом
     this.elements.expiryDate.addEventListener('input', (e) => {
       const formatted = formatExpiryDate(e.target.value);
       e.target.value = formatted;
@@ -180,14 +185,24 @@ export class CardForm {
       
       // Автопереход к CVV при заполнении
       if (formatted.length === 5) {
-        this.elements.cvv.focus();
+        this.scrollToField(this.elements.cvv);
       }
+    });
+
+    // Фокус на поле срока действия - скролл к полю
+    this.elements.expiryDate.addEventListener('focus', (e) => {
+      this.scrollToField(e.target);
     });
 
     // Ввод CVV
     this.elements.cvv.addEventListener('input', (e) => {
       e.target.value = e.target.value.replace(/\D/g, '');
       this.checkFormValidity();
+    });
+
+    // Фокус на поле CVV - скролл к полю
+    this.elements.cvv.addEventListener('focus', (e) => {
+      this.scrollToField(e.target);
     });
 
     // Кнопка звезды (основная карта)
@@ -222,6 +237,68 @@ export class CardForm {
       if (e.key === 'Escape' && this.elements.overlay.classList.contains('active')) {
         this.hide();
       }
+    });
+
+    // Обработка изменения размера окна (клавиатура)
+    this.handleKeyboardResize();
+  }
+
+  /**
+   * Плавный скролл к полю ввода с учетом клавиатуры
+   * @param {HTMLElement} field - Поле ввода
+   */
+  scrollToField(field) {
+    // Небольшая задержка для открытия клавиатуры
+    setTimeout(() => {
+      // Используем visualViewport для iOS
+      if (window.visualViewport) {
+        const fieldRect = field.getBoundingClientRect();
+        const viewportHeight = window.visualViewport.height;
+        const keyboardHeight = window.innerHeight - viewportHeight;
+        
+        // Если поле скрыто за клавиатурой
+        if (fieldRect.bottom > viewportHeight - 50) {
+          const scrollOffset = fieldRect.bottom - viewportHeight + 100;
+          window.scrollBy({
+            top: scrollOffset,
+            behavior: 'smooth'
+          });
+        }
+      }
+      
+      // Fallback: scrollIntoView
+      field.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 150);
+  }
+
+  /**
+   * Обработка изменения размера окна при открытии/закрытии клавиатуры
+   */
+  handleKeyboardResize() {
+    let lastHeight = window.innerHeight;
+    
+    window.visualViewport?.addEventListener('resize', () => {
+      const currentHeight = window.visualViewport.height;
+      
+      // Клавиатура открылась
+      if (currentHeight < lastHeight - 100) {
+        document.body.style.height = `${currentHeight}px`;
+        
+        // Скролл к активному полю
+        const activeElement = document.activeElement;
+        if (activeElement && activeElement.tagName === 'INPUT') {
+          this.scrollToField(activeElement);
+        }
+      }
+      // Клавиатура закрылась
+      else if (currentHeight > lastHeight + 100) {
+        document.body.style.height = '';
+      }
+      
+      lastHeight = currentHeight;
     });
   }
 
