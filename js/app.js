@@ -125,13 +125,15 @@ class App {
   }
 
   /**
-   * Инициализация swipe жестов для большой карты
+   * Инициализация swipe жестов и клика для большой карты
    */
   initSwipeGestures() {
     let startX = 0;
     let currentX = 0;
     let isSwiping = false;
-    const threshold = 100; // Минимальное расстояние для swipe
+    let startTime = 0;
+    const threshold = 50; // Минимальное расстояние для swipe
+    const timeThreshold = 300; // Максимальное время для клика
 
     const bigCard = this.elements.bigCard;
 
@@ -140,6 +142,7 @@ class App {
       if (this.isPaymentMode) return;
       
       startX = e.touches[0].clientX;
+      startTime = Date.now();
       isSwiping = true;
     }, { passive: true });
 
@@ -162,8 +165,13 @@ class App {
       if (!isSwiping || this.isPaymentMode) return;
       
       const diff = currentX - startX;
+      const elapsedTime = Date.now() - startTime;
       
-      if (diff < -threshold) {
+      // Если это был быстрый клик (не свайп)
+      if (Math.abs(diff) < 10 && elapsedTime < timeThreshold) {
+        // Клик по карте - запуск анимации полета
+        this.enterPaymentMode();
+      } else if (diff < -threshold) {
         // Свайп влево - активация оплаты
         this.enterPaymentMode();
       } else {
@@ -179,6 +187,7 @@ class App {
     bigCard.addEventListener('mousedown', (e) => {
       if (this.isPaymentMode) return;
       startX = e.clientX;
+      startTime = Date.now();
       isSwiping = true;
     });
 
@@ -198,8 +207,12 @@ class App {
       if (!isSwiping || this.isPaymentMode) return;
       
       const diff = currentX - startX;
+      const elapsedTime = Date.now() - startTime;
       
-      if (diff < -threshold) {
+      // Если это был быстрый клик (не свайп)
+      if (Math.abs(diff) < 10 && elapsedTime < timeThreshold) {
+        this.enterPaymentMode();
+      } else if (diff < -threshold) {
         this.enterPaymentMode();
       } else {
         this.elements.bigCardOverlay.style.opacity = '0';
