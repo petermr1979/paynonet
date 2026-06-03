@@ -132,22 +132,23 @@ body {
 }
 
 /* ===================================
-   Cards Grid
+   Cards Grid - 2 карты вверху
    =================================== */
 .cards-section {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+  margin-bottom: 20px;
 }
 
 .token-card {
   aspect-ratio: 1.586;
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 14px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -181,15 +182,15 @@ body {
 
 .token-card .star {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 20px;
-  height: 20px;
+  top: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
   color: rgba(255, 255, 255, 0.9);
 }
 
 .token-card .bank-name {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.95);
   text-transform: uppercase;
@@ -197,16 +198,33 @@ body {
 }
 
 .token-card .card-number {
-  font-size: 12px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.8);
   font-family: 'SF Mono', 'Courier New', monospace;
 }
 
+/* Пустое состояние для карт */
+.cards-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ios-text-secondary);
+}
+
+.cards-empty-text {
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.cards-empty-hint {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
 /* ===================================
-   Big Card
+   Big Card - пропорции банковской карты
    =================================== */
 .big-card-section {
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .big-card-container {
@@ -218,7 +236,9 @@ body {
 
 .big-card {
   position: relative;
-  height: 200px;
+  width: 100%;
+  aspect-ratio: 1.586;
+  min-height: 180px;
   background: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 100%);
   border-radius: 20px;
   overflow: hidden;
@@ -336,21 +356,25 @@ body {
 }
 
 /* ===================================
-   Tab Bar
+   Tab Bar - прозрачное облако
    =================================== */
 .tab-bar {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  height: var(--tab-bar-height);
-  padding-bottom: var(--safe-area-bottom);
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-top: 0.5px solid var(--ios-separator);
-  position: sticky;
-  bottom: 0;
+  position: fixed;
+  bottom: calc(16px + var(--safe-area-bottom));
+  left: 16px;
+  right: 16px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
+              0 2px 8px rgba(0, 0, 0, 0.06);
   z-index: 100;
+  padding: 0 8px;
 }
 
 .tab-btn {
@@ -367,10 +391,12 @@ body {
               transform 0.15s var(--transition-smooth);
   -webkit-appearance: none;
   appearance: none;
+  border-radius: 20px;
 }
 
 .tab-btn.active {
   color: var(--ios-primary);
+  background: rgba(0, 122, 255, 0.1);
 }
 
 .tab-btn:active {
@@ -378,8 +404,8 @@ body {
 }
 
 .tab-btn svg {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
 }
 
 /* ===================================
@@ -634,6 +660,8 @@ body {
 /* ===================================
    Адаптивность для разных размеров iPhone
    =================================== */
+
+/* iPhone SE, 5, 5S (375px и меньше) */
 @media (max-width: 375px) {
   .token-card {
     border-radius: 12px;
@@ -649,21 +677,86 @@ body {
   }
   
   .big-card {
-    height: 180px;
+    min-height: 160px;
   }
   
   .big-card-number {
     font-size: 18px;
   }
+  
+  .tab-bar {
+    height: 56px;
+  }
 }
 
+/* iPhone 6, 7, 8, X, XS (375px - 414px) */
+@media (min-width: 376px) and (max-width: 413px) {
+  .cards-grid {
+    gap: 14px;
+  }
+  
+  .token-card {
+    padding: 16px;
+  }
+}
+
+/* iPhone Plus, Max (414px и больше) - экран 6.3" */
 @media (min-width: 414px) {
   .cards-grid {
     gap: 16px;
   }
   
   .token-card {
+    padding: 18px;
+  }
+  
+  .token-card .bank-name {
+    font-size: 14px;
+  }
+  
+  .token-card .card-number {
+    font-size: 12px;
+  }
+  
+  .big-card {
+    min-height: 200px;
+  }
+  
+  .big-card-number {
+    font-size: 24px;
+  }
+  
+  .big-card-chip {
+    width: 60px;
+    height: 45px;
+  }
+  
+  .tab-bar {
+    height: 64px;
+  }
+  
+  .tab-btn svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* iPhone 14 Pro Max, 15 Pro Max (428px+) */
+@media (min-width: 428px) {
+  .main-content {
+    padding: 24px 20px;
+  }
+  
+  .cards-grid {
+    gap: 18px;
+  }
+  
+  .token-card {
     padding: 20px;
+  }
+  
+  .big-card {
+    min-height: 220px;
   }
 }
 

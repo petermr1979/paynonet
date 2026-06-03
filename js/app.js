@@ -51,8 +51,8 @@ class App {
     // Настройка обработчиков событий
     this.initEventListeners();
     
-    // Добавление демо-карт
-    this.addDemoCards();
+    // Показываем пустое состояние (карт нет)
+    this.renderEmptyState();
     
     console.log('PNN Wallet initialized');
   }
@@ -248,8 +248,16 @@ class App {
       isMain
     });
 
-    // Рендерим карту
+    // Если это первая карта, убираем пустое состояние
+    if (this.cardManager.cards.length === 1) {
+      document.getElementById('cardsGrid').innerHTML = '';
+    }
+
+    // Рендерим карту в верхней сетке
     this.cardRenderer.addCard(card);
+
+    // Обновляем большую карту внизу (последняя добавленная или основная)
+    this.updateBigCard(card);
 
     // Показываем индикатор загрузки
     await LoadingAnimations.show(this.elements.loadingOverlay);
@@ -261,6 +269,62 @@ class App {
     await LoadingAnimations.hide(this.elements.loadingOverlay);
 
     console.log('Card added:', card);
+  }
+
+  /**
+   * Обновляет большую карту внизу
+   * @param {Object} card - Данные карты
+   */
+  updateBigCard(card) {
+    const bigCard = this.elements.bigCard;
+    const content = bigCard.querySelector('.big-card-content');
+    
+    // Определяем цвет карты для градиента
+    const gradients = {
+      yellow: 'linear-gradient(135deg, #FFD60A 0%, #FFB800 100%)',
+      red: 'linear-gradient(135deg, #FF3B30 0%, #FF2D55 100%)',
+      blue: 'linear-gradient(135deg, #007AFF 0%, #5856D6 100%)',
+      green: 'linear-gradient(135deg, #34C759 0%, #30B0C7 100%)'
+    };
+    
+    const gradient = gradients[card.color] || gradients.blue;
+    
+    // Обновляем стиль большой карты
+    bigCard.style.background = gradient;
+    
+    // Обновляем номер карты
+    const maskedNumber = this.maskCardNumberBig(card.number);
+    content.querySelector('.big-card-number').textContent = maskedNumber;
+    
+    // Добавляем звезду если карта основная
+    let starHTML = '';
+    if (card.isMain) {
+      starHTML = `
+        <svg class="star" style="position: absolute; top: 20px; right: 20px; width: 28px; height: 28px; color: rgba(255, 255, 255, 0.9);" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+      `;
+    }
+    
+    // Удаляем старую звезду если есть
+    const oldStar = content.querySelector('.star');
+    if (oldStar) oldStar.remove();
+    
+    // Добавляем новую звезду
+    if (starHTML) {
+      content.insertAdjacentHTML('afterbegin', starHTML);
+    }
+  }
+
+  /**
+   * Маскирует номер карты для большой карты
+   * @param {string} number - Номер карты
+   * @returns {string} Замаскированный номер
+   */
+  maskCardNumberBig(number) {
+    const cleanNumber = number.replace(/\D/g, '');
+    const last4 = cleanNumber.slice(-4);
+    return `•••• •••• •••• ${last4}`;
   }
 
   /**
@@ -326,6 +390,19 @@ class App {
 
     // Устанавливаем основную карту
     this.cardManager.setMainCard('1');
+  }
+
+  /**
+   * Показывает пустое состояние (нет карт)
+   */
+  renderEmptyState() {
+    const grid = document.getElementById('cardsGrid');
+    grid.innerHTML = `
+      <div class="cards-empty" style="grid-column: 1 / -1;">
+        <div class="cards-empty-text">Нет добавленных карт</div>
+        <div class="cards-empty-hint">Нажмите + чтобы добавить карту</div>
+      </div>
+    `;
   }
 
   /**
