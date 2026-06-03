@@ -166,9 +166,13 @@ export class CardForm {
       e.target.value = formatted;
       this.checkFormValidity();
       
-      // Автопереход к следующему полю при заполнении
-      if (formatted.replace(/\s/g, '').length >= 16) {
-        this.scrollToField(this.elements.expiryDate);
+      // Автопереход к следующему полю при заполнении (16 цифр = 19 символов с пробелами)
+      const digitsOnly = formatted.replace(/\s/g, '');
+      if (digitsOnly.length >= 16) {
+        // Небольшая задержка перед переходом
+        setTimeout(() => {
+          this.scrollToField(this.elements.expiryDate);
+        }, 100);
       }
     });
 
@@ -183,9 +187,11 @@ export class CardForm {
       e.target.value = formatted;
       this.checkFormValidity();
       
-      // Автопереход к CVV при заполнении
+      // Автопереход к CVV при заполнении (5 символов: MM/YY)
       if (formatted.length === 5) {
-        this.scrollToField(this.elements.cvv);
+        setTimeout(() => {
+          this.scrollToField(this.elements.cvv);
+        }, 100);
       }
     });
 
@@ -248,29 +254,42 @@ export class CardForm {
    * @param {HTMLElement} field - Поле ввода
    */
   scrollToField(field) {
-    // Небольшая задержка для открытия клавиатуры
+    // Фокус на поле
+    field.focus();
+    
+    // Небольшая задержка для открытия клавиатуры и фокуса
     setTimeout(() => {
       // Используем visualViewport для iOS
       if (window.visualViewport) {
         const fieldRect = field.getBoundingClientRect();
         const viewportHeight = window.visualViewport.height;
+        const viewportOffset = window.visualViewport.offsetTop;
         const keyboardHeight = window.innerHeight - viewportHeight;
         
-        // Если поле скрыто за клавиатурой
-        if (fieldRect.bottom > viewportHeight - 50) {
-          const scrollOffset = fieldRect.bottom - viewportHeight + 100;
-          window.scrollBy({
-            top: scrollOffset,
+        // Вычисляем позицию поля относительно viewport
+        const fieldTop = fieldRect.top + viewportOffset;
+        const fieldBottom = fieldRect.bottom + viewportOffset;
+        
+        // Дополнительный отступ для комфортного просмотра
+        const padding = 120;
+        
+        // Если поле скрыто за клавиатурой или ниже видимой области
+        if (fieldBottom > viewportHeight - padding || fieldTop < viewportOffset + padding) {
+          // Целевая позиция: поле должно быть по центру видимой области
+          const targetScroll = fieldTop - padding;
+          
+          window.scrollTo({
+            top: Math.max(0, targetScroll),
             behavior: 'smooth'
           });
         }
+      } else {
+        // Fallback для браузеров без visualViewport
+        field.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
       }
-      
-      // Fallback: scrollIntoView
-      field.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
     }, 150);
   }
 
@@ -278,14 +297,17 @@ export class CardForm {
    * Обработка изменения размера окна при открытии/закрытии клавиатуры
    */
   handleKeyboardResize() {
-    let lastHeight = window.innerHeight;
+    let lastHeight = window.visualViewport?.height || window.innerHeight;
+    let keyboardOpen = false;
     
     window.visualViewport?.addEventListener('resize', () => {
       const currentHeight = window.visualViewport.height;
+      const viewportOffset = window.visualViewport.offsetTop;
+      const threshold = 200; // Порог для определения клавиатуры
       
-      // Клавиатура открылась
-      if (currentHeight < lastHeight - 100) {
-        document.body.style.height = `${currentHeight}px`;
+      // Клавиатура открылась (высота уменьшилась)
+      if (lastHeight - currentHeight > threshold && !keyboardOpen) {
+        keyboardOpen = true;
         
         // Скролл к активному полю
         const activeElement = document.activeElement;
@@ -293,12 +315,25 @@ export class CardForm {
           this.scrollToField(activeElement);
         }
       }
-      // Клавиатура закрылась
-      else if (currentHeight > lastHeight + 100) {
-        document.body.style.height = '';
+      // Клавиатура закрылась (высота увеличилась)
+      else if (currentHeight - lastHeight > threshold && keyboardOpen) {
+        keyboardOpen = false;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       
       lastHeight = currentHeight;
+    });
+    
+    // Обработка скролла viewport
+    window.visualViewport?.addEventListener('scroll', () => {
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.tagName === 'INPUT') {
+        // Проверяем, видно ли поле
+        const fieldRect = activeElement.getBoundingClientRect();
+        if (fieldRect.bottom > window.innerHeight - 50) {
+          this.scrollToField(activeElement);
+        }
+      }
     });
   }
 

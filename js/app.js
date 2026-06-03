@@ -460,38 +460,11 @@ class App {
    * Обработка клавиатуры на iOS
    */
   handleIOSKeyboard() {
-    // Предотвращаем зум при фокусе на input
-    document.addEventListener('focusin', (e) => {
-      if (e.target.tagName === 'INPUT') {
-        // Используем visualViewport для iOS
-        if (window.visualViewport) {
-          setTimeout(() => {
-            const viewportHeight = window.visualViewport.height;
-            const keyboardHeight = window.innerHeight - viewportHeight;
-            
-            // Если клавиатура открылась
-            if (keyboardHeight > 100) {
-              const fieldRect = e.target.getBoundingClientRect();
-              
-              // Если поле слишком низко
-              if (fieldRect.bottom > viewportHeight - 50) {
-                const scrollOffset = fieldRect.bottom - viewportHeight + 100;
-                window.scrollBy({
-                  top: scrollOffset,
-                  behavior: 'smooth'
-                });
-              }
-            }
-          }, 150);
-        }
-      }
-    });
-
-    // Восстанавливаем высоту при потере фокуса
+    // Восстанавливаем высоту при потере фокуса (глобальный обработчик)
     document.addEventListener('focusout', (e) => {
       if (e.target.tagName === 'INPUT') {
         setTimeout(() => {
-          window.scrollTo(0, 0);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 300);
       }
     });
