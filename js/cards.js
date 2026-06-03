@@ -1,333 +1,377 @@
 /**
- * Cards Module - управление каруселью карт и логика добавления
+ * PNN Wallet - Управление картами
  */
 
-class CardsManager {
-    constructor() {
-        this.cardsContainer = document.getElementById('cardsContainer');
-        this.cards = [];
-        this.activeIndex = 0;
-        this.touchStartX = 0;
-        this.touchEndX = 0;
-        this.isDragging = false;
-        
-        // BIN коды платёжной системы "Мир" (основные диапазоны)
-        this.mirBins = [
-            '2200', '2201', '2202', '2203', '2204', '2205', '2206', '2207',
-            '2208', '2209', '221', '222', '223', '224', '225', '226', '227',
-            '228', '229', '220000', '220001', '220002', '220003', '220004',
-            '220005', '220006', '220007', '220008', '220009'
-        ];
-        
-        this.init();
+import { 
+  formatCardNumber, 
+  formatExpiryDate, 
+  isValidCardNumber, 
+  isValidExpiryDate, 
+  isValidCVV,
+  getRandomCardColor,
+  maskCardNumber 
+} from './utils.js';
+
+/**
+ * Класс для управления коллекцией карт
+ */
+export class CardManager {
+  constructor() {
+    this.cards = [];
+    this.mainCardId = null;
+  }
+
+  /**
+   * Добавляет новую карту
+   * @param {Object} cardData - Данные карты
+   * @returns {Object} Добавленная карта
+   */
+  addCard(cardData) {
+    const card = {
+      id: Date.now().toString(),
+      number: cardData.number,
+      expiryDate: cardData.expiryDate,
+      color: cardData.color || getRandomCardColor(),
+      isMain: cardData.isMain || false,
+      createdAt: new Date().toISOString()
+    };
+
+    // Если карта помечена как основная
+    if (card.isMain) {
+      this.setMainCard(card.id);
     }
 
-    init() {
-        this.setupTouchHandlers();
-        this.loadCards();
+    this.cards.push(card);
+    return card;
+  }
+
+  /**
+   * Устанавливает карту как основную
+   * @param {string} cardId - ID карты
+   */
+  setMainCard(cardId) {
+    // Снимаем статус основной со всех карт
+    this.cards.forEach(card => {
+      card.isMain = false;
+    });
+
+    // Устанавливаем основную карту
+    const card = this.cards.find(c => c.id === cardId);
+    if (card) {
+      card.isMain = true;
+      this.mainCardId = cardId;
+    }
+  }
+
+  /**
+   * Получает основную карту
+   * @returns {Object|null} Основная карта или null
+   */
+  getMainCard() {
+    return this.cards.find(card => card.isMain) || null;
+  }
+
+  /**
+   * Получает все карты
+   * @returns {Array} Массив карт
+   */
+  getAllCards() {
+    return this.cards;
+  }
+
+  /**
+   * Удаляет карту
+   * @param {string} cardId - ID карты
+   */
+  removeCard(cardId) {
+    const index = this.cards.findIndex(card => card.id === cardId);
+    if (index !== -1) {
+      const card = this.cards[index];
+      
+      // Если удаляемая карта была основной, сбрасываем
+      if (card.isMain) {
+        this.mainCardId = null;
+      }
+      
+      this.cards.splice(index, 1);
+    }
+  }
+
+  /**
+   * Получает карту по ID
+   * @param {string} cardId - ID карты
+   * @returns {Object|null} Карта или null
+   */
+  getCard(cardId) {
+    return this.cards.find(card => card.id === cardId) || null;
+  }
+
+  /**
+   * Валидирует данные формы карты
+   * @param {Object} formData - Данные формы
+   * @returns {Object} Результат валидации
+   */
+  validateCardForm(formData) {
+    const errors = {};
+
+    if (!isValidCardNumber(formData.number)) {
+      errors.number = 'Введите корректный номер карты (16-19 цифр)';
     }
 
-    /**
-     * Проверка BIN карты на принадлежность к "Мир"
-     */
-    isMirCard(cardNumber) {
-        const cleanNumber = cardNumber.replace(/\s/g, '');
-        const bin4 = cleanNumber.substring(0, 4);
-        const bin6 = cleanNumber.substring(0, 6);
-        
-        // Проверка по 4 цифрам
-        if (this.mirBins.some(bin => bin4.startsWith(bin))) {
-            return true;
-        }
-        
-        // Проверка по 6 цифрам
-        if (this.mirBins.some(bin => bin6.startsWith(bin))) {
-            return true;
-        }
-        
-        // Дополнительные диапазоны "Мир"
-        const mirRanges = [
-            { start: 220000, end: 220499 },
-            { start: 220000, end: 229999 }
-        ];
-        
-        const bin6Num = parseInt(bin6);
-        if (!isNaN(bin6Num)) {
-            for (const range of mirRanges) {
-                if (bin6Num >= range.start && bin6Num <= range.end) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
+    if (!isValidExpiryDate(formData.expiryDate)) {
+      errors.expiryDate = 'Введите корректный срок действия';
     }
 
-    /**
-     * Форматирование номера карты (группы по 4 цифры)
-     */
-    formatCardNumber(number) {
-        const clean = number.replace(/\D/g, '');
-        const groups = clean.match(/.{1,4}/g);
-        if (!groups) return '';
-        return groups.join(' ');
+    if (formData.cvv && !isValidCVV(formData.cvv)) {
+      errors.cvv = 'Введите корректный CVV (3 цифры)';
     }
 
-    /**
-     * Форматирование срока действия (MM/YY)
-     */
-    formatExpiryDate(date) {
-        const clean = date.replace(/\D/g, '');
-        if (clean.length >= 2) {
-            return clean.substring(0, 2) + '/' + clean.substring(2, 4);
-        }
-        return clean;
-    }
-
-    /**
-     * Проверка срока действия (не в прошлом)
-     */
-    isValidExpiry(expiry) {
-        if (!expiry || expiry.length !== 5) return false;
-        
-        const [month, year] = expiry.split('/').map(Number);
-        if (!month || !year) return false;
-        
-        if (month < 1 || month > 12) return false;
-        
-        const now = new Date();
-        const currentYear = parseInt(now.getFullYear().toString().substr(-2));
-        const currentMonth = now.getMonth() + 1;
-        
-        if (year < currentYear) return false;
-        if (year === currentYear && month < currentMonth) return false;
-        
-        return true;
-    }
-
-    /**
-     * Загрузка карт из хранилища
-     */
-    async loadCards() {
-        try {
-            this.cards = await storage.getAllCards();
-            this.renderCards();
-        } catch (error) {
-            console.error('Ошибка загрузки карт:', error);
-            // Демо-карты для MVP
-            this.cards = [
-                {
-                    id: '1',
-                    last4: '4276',
-                    holder: 'IVAN IVANOV',
-                    expiry: '12/25',
-                    isPrimary: true,
-                    token: 'demo_token_1'
-                }
-            ];
-            this.renderCards();
-        }
-    }
-
-    /**
-     * Отрисовка карт в карусели
-     */
-    renderCards() {
-        this.cardsContainer.innerHTML = '';
-        
-        if (this.cards.length === 0) {
-            // Пустое состояние
-            this.cardsContainer.innerHTML = `
-                <div class="empty-state">
-                    <p style="color: var(--text-tertiary); text-align: center;">
-                        Нет карт<br>
-                        <small>Нажмите + чтобы добавить</small>
-                    </p>
-                </div>
-            `;
-            return;
-        }
-
-        this.cards.forEach((card, index) => {
-            const cardElement = this.createCardElement(card, index);
-            this.cardsContainer.appendChild(cardElement);
-        });
-
-        this.updateCardPositions();
-    }
-
-    /**
-     * Создание элемента карты
-     */
-    createCardElement(card, index) {
-        const el = document.createElement('div');
-        el.className = `card ${index === this.activeIndex ? 'active' : ''}`;
-        el.dataset.index = index;
-        el.dataset.cardId = card.id;
-
-        el.innerHTML = `
-            <div class="card-header">
-                <svg class="mir-logo" viewBox="0 0 80 30">
-                    <text x="40" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">МИР</text>
-                </svg>
-                <div class="card-chip"></div>
-            </div>
-            <div class="card-number">•••• ${card.last4}</div>
-            <div class="card-footer">
-                <span class="card-holder">${card.holder}</span>
-                <span class="card-expiry">${card.expiry}</span>
-            </div>
-        `;
-
-        return el;
-    }
-
-    /**
-     * Обновление позиций карт в карусели
-     */
-    updateCardPositions() {
-        const cards = this.cardsContainer.querySelectorAll('.card');
-        
-        cards.forEach((card, index) => {
-            card.className = 'card';
-            
-            if (index === this.activeIndex) {
-                card.classList.add('active');
-            } else if (index < this.activeIndex) {
-                card.classList.add('prev');
-            } else {
-                card.classList.add('next');
-            }
-        });
-    }
-
-    /**
-     * Переход к следующей карте
-     */
-    nextCard() {
-        if (this.activeIndex < this.cards.length - 1) {
-            this.activeIndex++;
-            this.updateCardPositions();
-        }
-    }
-
-    /**
-     * Переход к предыдущей карте
-     */
-    prevCard() {
-        if (this.activeIndex > 0) {
-            this.activeIndex--;
-            this.updateCardPositions();
-        }
-    }
-
-    /**
-     * Добавление новой карты
-     */
-    async addCard(cardData) {
-        try {
-            const newCard = {
-                id: Date.now().toString(),
-                last4: cardData.number.slice(-4),
-                holder: cardData.holder || 'CARDHOLDER',
-                expiry: cardData.expiry,
-                isPrimary: cardData.isPrimary || false,
-                token: 'pending_tokenization'
-            };
-
-            // Если карта установлена как основная, снимаем статус с других
-            if (newCard.isPrimary) {
-                this.cards.forEach(card => card.isPrimary = false);
-            } else if (this.cards.length === 0) {
-                newCard.isPrimary = true;
-            }
-
-            this.cards.push(newCard);
-            this.activeIndex = this.cards.length - 1;
-            
-            // Сохраняем в хранилище
-            await storage.addCard(newCard);
-            
-            this.renderCards();
-            return newCard;
-        } catch (error) {
-            console.error('Ошибка добавления карты:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Настройка обработчиков касаний для смахивания
-     */
-    setupTouchHandlers() {
-        let touchStartTime = 0;
-
-        this.cardsContainer.addEventListener('touchstart', (e) => {
-            const card = e.target.closest('.card.active');
-            if (!card) return;
-            
-            this.isDragging = true;
-            this.touchStartX = e.touches[0].clientX;
-            touchStartTime = Date.now();
-        }, { passive: true });
-
-        this.cardsContainer.addEventListener('touchmove', (e) => {
-            if (!this.isDragging) return;
-            
-            const card = this.cardsContainer.querySelector('.card.active');
-            if (!card) return;
-            
-            this.touchEndX = e.touches[0].clientX;
-            const diff = this.touchEndX - this.touchStartX;
-            
-            // Визуальное смещение карты при свайпе
-            card.style.transform = `translateX(${diff}px) rotate(${diff / 20}deg)`;
-        }, { passive: true });
-
-        this.cardsContainer.addEventListener('touchend', async (e) => {
-            if (!this.isDragging) return;
-            this.isDragging = false;
-            
-            const card = this.cardsContainer.querySelector('.card.active');
-            if (!card) return;
-            
-            const diff = this.touchEndX - this.touchStartX;
-            const timeDiff = Date.now() - touchStartTime;
-            
-            // Свайп вправо для активации передачи токена
-            if (diff > 100 || (diff > 50 && timeDiff < 300)) {
-                // Запуск анимации гиперпространства
-                await this.onSwipeRight(card);
-            } else if (diff < -100) {
-                // Свайп влево - переход к следующей карте
-                this.nextCard();
-            } else {
-                // Возврат в исходное положение
-                card.style.transition = 'transform 0.3s ease';
-                card.style.transform = '';
-            }
-            
-            this.touchEndX = 0;
-        }, { passive: true });
-    }
-
-    /**
-     * Обработчик смахивания вправо
-     */
-    async onSwipeRight(card) {
-        // Событие для главного приложения
-        document.dispatchEvent(new CustomEvent('cardSwipeRight', {
-            detail: { cardId: card.dataset.cardId }
-        }));
-    }
-
-    /**
-     * Получение активной карты
-     */
-    getActiveCard() {
-        return this.cards[this.activeIndex] || null;
-    }
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
 }
 
-// Экспорт экземпляра
-const cardsManager = new CardsManager();
+/**
+ * Класс для управления формой добавления карты
+ */
+export class CardForm {
+  constructor(onSubmit, onCancel) {
+    this.onSubmit = onSubmit;
+    this.onCancel = onCancel;
+    this.isMain = false;
+    
+    this.elements = {
+      overlay: document.getElementById('modalOverlay'),
+      card: document.getElementById('modalCard'),
+      cardNumber: document.getElementById('cardNumber'),
+      expiryDate: document.getElementById('expiryDate'),
+      cvv: document.getElementById('cvv'),
+      starBtn: document.getElementById('starBtn'),
+      okBtn: document.getElementById('okBtn'),
+      cancelBtn: document.getElementById('cancelBtn')
+    };
+
+    this.init();
+  }
+
+  /**
+   * Инициализация обработчиков событий
+   */
+  init() {
+    // Форматирование номера карты
+    this.elements.cardNumber.addEventListener('input', (e) => {
+      const formatted = formatCardNumber(e.target.value);
+      e.target.value = formatted;
+      this.checkFormValidity();
+      
+      // Автопереход к следующему полю при заполнении
+      if (formatted.replace(/\s/g, '').length >= 16) {
+        this.elements.expiryDate.focus();
+      }
+    });
+
+    // Форматирование срока действия
+    this.elements.expiryDate.addEventListener('input', (e) => {
+      const formatted = formatExpiryDate(e.target.value);
+      e.target.value = formatted;
+      this.checkFormValidity();
+      
+      // Автопереход к CVV при заполнении
+      if (formatted.length === 5) {
+        this.elements.cvv.focus();
+      }
+    });
+
+    // Ввод CVV
+    this.elements.cvv.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '');
+      this.checkFormValidity();
+    });
+
+    // Кнопка звезды (основная карта)
+    this.elements.starBtn.addEventListener('click', () => {
+      this.isMain = !this.isMain;
+      this.elements.starBtn.classList.toggle('active', this.isMain);
+    });
+
+    // Кнопка отмены
+    this.elements.cancelBtn.addEventListener('click', () => {
+      this.hide();
+    });
+
+    // Кнопка OK
+    this.elements.okBtn.addEventListener('click', () => {
+      if (this.elements.okBtn.disabled) return;
+      
+      const formData = this.getFormData();
+      this.onSubmit(formData, this.isMain);
+      this.hide();
+    });
+
+    // Закрытие по клику на overlay
+    this.elements.overlay.addEventListener('click', (e) => {
+      if (e.target === this.elements.overlay) {
+        this.hide();
+      }
+    });
+
+    // Обработка клавиши Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.elements.overlay.classList.contains('active')) {
+        this.hide();
+      }
+    });
+  }
+
+  /**
+   * Проверяет валидность формы и активирует кнопку OK
+   */
+  checkFormValidity() {
+    const number = this.elements.cardNumber.value.replace(/\s/g, '');
+    const expiryDate = this.elements.expiryDate.value;
+    const cvv = this.elements.cvv.value;
+
+    const isValid = isValidCardNumber(this.elements.cardNumber.value) &&
+                    isValidExpiryDate(expiryDate);
+
+    this.elements.okBtn.disabled = !isValid;
+  }
+
+  /**
+   * Получает данные формы
+   * @returns {Object} Данные формы
+   */
+  getFormData() {
+    return {
+      number: this.elements.cardNumber.value,
+      expiryDate: this.elements.expiryDate.value,
+      cvv: this.elements.cvv.value
+    };
+  }
+
+  /**
+   * Показывает модальное окно
+   */
+  show() {
+    this.elements.overlay.classList.add('active');
+    
+    // Автофокус на первом поле после анимации
+    setTimeout(() => {
+      this.elements.cardNumber.focus();
+    }, 400);
+  }
+
+  /**
+   * Скрывает модальное окно и сбрасывает форму
+   */
+  hide() {
+    this.elements.overlay.classList.remove('active');
+    this.reset();
+  }
+
+  /**
+   * Сбрасывает форму
+   */
+  reset() {
+    this.elements.cardNumber.value = '';
+    this.elements.expiryDate.value = '';
+    this.elements.cvv.value = '';
+    this.isMain = false;
+    this.elements.starBtn.classList.remove('active');
+    this.elements.okBtn.disabled = true;
+  }
+}
+
+/**
+ * Класс для рендеринга карточек
+ */
+export class CardRenderer {
+  constructor(containerId) {
+    this.container = document.getElementById(containerId);
+  }
+
+  /**
+   * Создает SVG иконку звезды
+   * @param {boolean} filled - Заполненная звезда или нет
+   * @returns {string} SVG строка
+   */
+  createStarIcon(filled = false) {
+    if (filled) {
+      return `
+        <svg class="star" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+      `;
+    }
+    return `
+      <svg class="star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+      </svg>
+    `;
+  }
+
+  /**
+   * Рендерит одну карточку
+   * @param {Object} card - Данные карты
+   * @returns {string} HTML строка
+   */
+  renderCard(card) {
+    const starIcon = card.isMain ? this.createStarIcon(true) : '';
+    const maskedNumber = maskCardNumber(card.number);
+    
+    return `
+      <div class="token-card ${card.color}" data-card-id="${card.id}">
+        ${starIcon}
+        <span class="bank-name">Bank ${card.id.slice(-2)}</span>
+        <span class="card-number">${maskedNumber}</span>
+      </div>
+    `;
+  }
+
+  /**
+   * Рендерит все карты
+   * @param {Array} cards - Массив карт
+   */
+  renderAll(cards) {
+    this.container.innerHTML = cards.map(card => this.renderCard(card)).join('');
+  }
+
+  /**
+   * Добавляет карту в список
+   * @param {Object} card - Данные карты
+   */
+  addCard(card) {
+    const cardHTML = this.renderCard(card);
+    this.container.insertAdjacentHTML('beforeend', cardHTML);
+  }
+
+  /**
+   * Удаляет карту из списка
+   * @param {string} cardId - ID карты
+   */
+  removeCard(cardId) {
+    const cardElement = this.container.querySelector(`[data-card-id="${cardId}"]`);
+    if (cardElement) {
+      cardElement.remove();
+    }
+  }
+
+  /**
+   * Обновляет отображение основной карты
+   * @param {string} mainCardId - ID основной карты
+   */
+  updateMainCard(mainCardId) {
+    const allStars = this.container.querySelectorAll('.star');
+    allStars.forEach(star => star.remove());
+
+    const cards = this.container.querySelectorAll('.token-card');
+    cards.forEach(card => {
+      const cardId = card.getAttribute('data-card-id');
+      if (cardId === mainCardId) {
+        card.insertAdjacentHTML('afterbegin', this.createStarIcon(true));
+      }
+    });
+  }
+}

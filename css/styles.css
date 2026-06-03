@@ -1,675 +1,696 @@
-/* CSS Variables для Glass Morphism и iOS 16+ стиля */
+/* ===================================
+   PNN Wallet - Основные стили iOS
+   =================================== */
+
+/* CSS Переменные */
 :root {
-    /* Цветовая палитра */
-    --bg-primary: #0a0a1a;
-    --bg-secondary: #12122a;
-    --bg-tertiary: #1a1a3e;
-    
-    /* Glass Morphism эффекты */
-    --glass-bg: rgba(255, 255, 255, 0.08);
-    --glass-bg-light: rgba(255, 255, 255, 0.12);
-    --glass-border: rgba(255, 255, 255, 0.15);
-    --glass-blur: 20px;
-    
-    /* Акцентные цвета */
-    --accent-primary: #6366f1;
-    --accent-secondary: #8b5cf6;
-    --accent-success: #10b981;
-    --accent-error: #ef4444;
-    --accent-gold: #fbbf24;
-    
-    /* Текст */
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --text-tertiary: rgba(255, 255, 255, 0.5);
-    
-    /* Размеры для iPhone */
-    --safe-area-top: env(safe-area-inset-top, 44px);
-    --safe-area-bottom: env(safe-area-inset-bottom, 34px);
-    --card-aspect-ratio: 85/54;
+  /* Цвета iOS */
+  --ios-bg: #F2F2F7;
+  --ios-card-bg: #FFFFFF;
+  --ios-primary: #007AFF;
+  --ios-red: #FF3B30;
+  --ios-green: #34C759;
+  --ios-yellow: #FFD60A;
+  --ios-blue: #007AFF;
+  --ios-text: #1C1C1E;
+  --ios-text-secondary: #8E8E93;
+  --ios-separator: #C6C6C8;
+  --ios-gold: #FFD700;
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-blur: 20px;
+  
+  /* Размеры */
+  --safe-area-top: env(safe-area-inset-top, 47px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 34px);
+  --header-height: calc(44px + var(--safe-area-top));
+  --tab-bar-height: calc(49px + var(--safe-area-bottom));
+  
+  /* Анимации */
+  --transition-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* Базовые стили */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
+/* Сброс стилей */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
-    height: 100%;
-    overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    overscroll-behavior: none;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--ios-bg);
+  color: var(--ios-text);
+  font-size: 17px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #app {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
-/* Верхняя панель */
-.top-bar {
-    height: calc(var(--safe-area-top) + 20px);
-    padding-top: var(--safe-area-top);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-left: 16px;
-    padding-right: 16px;
-    background: linear-gradient(180deg, rgba(10, 10, 26, 0.9) 0%, rgba(10, 10, 26, 0) 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+/* ===================================
+   Header
+   =================================== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-height);
+  padding: var(--safe-area-top) 16px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 0.5px solid var(--ios-separator);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+.header-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ios-card-bg);
+  color: var(--ios-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s var(--transition-smooth),
+              background-color 0.15s var(--transition-smooth);
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-.avatar:active {
-    transform: scale(0.95);
+.header-btn:active {
+  transform: scale(0.92);
+  background-color: var(--ios-bg);
 }
 
-#avatar-initials {
-    color: white;
+.header-btn svg {
+  width: 24px;
+  height: 24px;
 }
 
 .logo {
-    flex: 1;
-    display: flex;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.logo-svg {
-    height: 30px;
-    width: auto;
+.logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 
-.add-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--glass-bg-light);
-    border: 1px solid var(--glass-border);
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-.add-btn:active {
-    background: var(--accent-primary);
-    transform: scale(0.95);
-}
-
-/* Основная область */
+/* ===================================
+   Main Content
+   =================================== */
 .main-content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 16px;
+  padding-bottom: calc(20px + var(--safe-area-bottom));
 }
 
-/* Карусель карт */
-.cards-carousel {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 1000px;
-    overflow: visible;
+/* ===================================
+   Cards Grid
+   =================================== */
+.cards-section {
+  margin-bottom: 24px;
 }
 
-.cards-container {
-    position: relative;
-    width: 320px;
-    height: 200px;
-    transform-style: preserve-3d;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
-/* Стиль карты */
-.card {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 16px;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.05) 100%
-    );
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: grab;
-    overflow: hidden;
+.token-card {
+  aspect-ratio: 1.586;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s var(--transition-smooth),
+              box-shadow 0.2s var(--transition-smooth);
+  will-change: transform;
 }
 
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent
-    );
-    transition: left 0.5s ease;
+.token-card:active {
+  transform: scale(0.96);
 }
 
-.card.swiping::before {
-    left: 100%;
+.token-card.yellow {
+  background: linear-gradient(135deg, #FFD60A 0%, #FFB800 100%);
 }
 
-.card.active {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-    z-index: 10;
+.token-card.red {
+  background: linear-gradient(135deg, #FF3B30 0%, #FF2D55 100%);
 }
 
-.card.prev {
-    transform: translateX(-120%) scale(0.85) rotateY(-15deg);
-    opacity: 0.5;
-    z-index: 5;
-    pointer-events: none;
+.token-card.blue {
+  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
 }
 
-.card.next {
-    transform: translateX(120%) scale(0.85) rotateY(15deg);
-    opacity: 0.5;
-    z-index: 5;
-    pointer-events: none;
+.token-card.green {
+  background: linear-gradient(135deg, #34C759 0%, #30B0C7 100%);
 }
 
-.card.hyperspace {
-    transform: translateX(100vw) scale(0.5);
-    opacity: 0;
+.token-card .star {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-/* Содержимое карты */
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+.token-card .bank-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.mir-logo {
-    height: 24px;
-    width: auto;
-    opacity: 0.9;
+.token-card .card-number {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'SF Mono', 'Courier New', monospace;
 }
 
-.card-chip {
-    width: 40px;
-    height: 30px;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    border-radius: 6px;
-    opacity: 0.8;
+/* ===================================
+   Big Card
+   =================================== */
+.big-card-section {
+  margin-top: 16px;
 }
 
-.card-number {
-    font-size: 18px;
-    font-family: 'SF Mono', 'Monaco', monospace;
-    letter-spacing: 2px;
-    text-align: center;
-    color: var(--text-primary);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+.big-card-container {
+  perspective: 1000px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+.big-card {
+  position: relative;
+  height: 200px;
+  background: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 100%);
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s var(--transition-smooth);
 }
 
-.card-holder {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    letter-spacing: 1px;
+.big-card-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: opacity 0.3s var(--transition-smooth);
 }
 
-.card-expiry {
-    font-size: 12px;
-    font-family: 'SF Mono', 'Monaco', monospace;
-    color: var(--text-secondary);
+.big-card-chip {
+  width: 50px;
+  height: 38px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border-radius: 8px;
+  align-self: flex-start;
 }
 
-/* Нижняя панель навигации */
+.big-card-number {
+  font-size: 22px;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: 'SF Mono', 'Courier New', monospace;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.big-card-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.big-card-label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.big-card-value {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* Big Card Overlay (Payment Mode) */
+.big-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s var(--transition-smooth),
+              visibility 0.3s var(--transition-smooth);
+}
+
+.big-card-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+#flightCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.cancel-btn {
+  position: relative;
+  z-index: 2;
+  padding: 16px 48px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 30px;
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.15s var(--transition-smooth),
+              background-color 0.15s var(--transition-smooth);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.cancel-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===================================
+   Tab Bar
+   =================================== */
 .tab-bar {
-    height: calc(83px + var(--safe-area-bottom));
-    padding-bottom: var(--safe-area-bottom);
-    background: rgba(18, 18, 42, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--glass-border);
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-start;
-    padding-top: 8px;
-    position: sticky;
-    bottom: 0;
-    z-index: 100;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: var(--tab-bar-height);
+  padding-bottom: var(--safe-area-bottom);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-top: 0.5px solid var(--ios-separator);
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
 }
 
 .tab-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    color: var(--text-tertiary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    padding: 8px 0;
-}
-
-.tab-btn svg {
-    margin-bottom: 4px;
-    transition: transform 0.2s ease;
-}
-
-.tab-btn:active svg {
-    transform: scale(0.9);
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--ios-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s var(--transition-smooth),
+              transform 0.15s var(--transition-smooth);
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .tab-btn.active {
-    color: var(--accent-primary);
+  color: var(--ios-primary);
 }
 
-.tab-btn span {
-    font-size: 10px;
-    font-weight: 500;
+.tab-btn:active {
+  transform: scale(0.9);
 }
 
-/* Модальное окно */
+.tab-btn svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* ===================================
+   Modal Overlay
+   =================================== */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s var(--transition-smooth),
+              visibility 0.3s var(--transition-smooth);
 }
 
 .modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
+/* Modal Card */
 .modal-card {
-    width: calc(100% - 32px);
-    max-width: 400px;
-    background: rgba(26, 26, 62, 0.95);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border-radius: 24px 24px 0 0;
-    border: 1px solid var(--glass-border);
-    padding: 24px;
-    transform: translateY(100%) rotateX(30deg);
-    transform-origin: bottom;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 90vh;
-    overflow-y: auto;
+  width: calc(100% - 32px);
+  margin: 0 16px;
+  background: var(--ios-card-bg);
+  border-radius: 20px;
+  overflow: hidden;
+  transform: translateY(100%) rotateX(90deg);
+  transform-origin: bottom center;
+  transition: transform 0.4s var(--transition-bounce);
+  will-change: transform;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-overlay.active .modal-card {
-    transform: translateY(0) rotateX(0);
+  transform: translateY(0) rotateX(0);
 }
 
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 0.5px solid var(--ios-separator);
 }
 
-.modal-header h2 {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text-primary);
+.modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ios-text);
 }
 
 .star-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    color: var(--text-tertiary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--ios-separator);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s var(--transition-smooth),
+              transform 0.15s var(--transition-smooth);
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .star-btn.active {
-    color: var(--accent-gold);
-    background: rgba(251, 191, 36, 0.2);
+  color: var(--ios-gold);
 }
 
-/* Форма */
-.form-group {
-    margin-bottom: 16px;
+.star-btn:active {
+  transform: scale(0.9);
 }
 
-.form-row {
-    display: flex;
-    gap: 16px;
+.star-btn svg {
+  width: 24px;
+  height: 24px;
 }
 
-.form-row .form-group {
-    flex: 1;
+.star-outline {
+  fill: none;
+  stroke: currentColor;
 }
 
-.form-group label {
-    display: block;
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-    font-weight: 500;
+.star-btn.active .star-outline {
+  fill: var(--ios-gold);
+  stroke: var(--ios-gold);
 }
 
-.form-group input {
-    width: 100%;
-    padding: 14px 16px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    color: var(--text-primary);
-    font-size: 16px;
-    font-family: inherit;
-    transition: all 0.2s ease;
-    -webkit-appearance: none;
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.form-group input:focus {
-    outline: none;
-    border-color: var(--accent-primary);
-    background: rgba(99, 102, 241, 0.1);
+.input-group {
+  margin-bottom: 20px;
 }
 
-.form-group input.error {
-    border-color: var(--accent-error);
-    background: rgba(239, 68, 68, 0.1);
+.input-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ios-text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.form-group input::placeholder {
-    color: var(--text-tertiary);
+.input-field {
+  width: 100%;
+  padding: 16px;
+  font-size: 17px;
+  font-family: inherit;
+  border: 1px solid var(--ios-separator);
+  border-radius: 12px;
+  background: var(--ios-bg);
+  color: var(--ios-text);
+  transition: border-color 0.2s var(--transition-smooth),
+              background-color 0.2s var(--transition-smooth);
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-.error-msg {
-    display: none;
-    font-size: 12px;
-    color: var(--accent-error);
-    margin-top: 6px;
+.input-field:focus {
+  outline: none;
+  border-color: var(--ios-primary);
+  background: var(--ios-card-bg);
 }
 
-.form-group input.error + .error-msg {
-    display: block;
+.input-field::placeholder {
+  color: var(--ios-text-secondary);
 }
 
-/* Кнопки модального окна */
-.modal-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
-.modal-actions button {
-    flex: 1;
-    padding: 16px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
+.input-row .input-group {
+  margin-bottom: 0;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  padding: 20px;
+  border-top: 0.5px solid var(--ios-separator);
+}
+
+.btn {
+  flex: 1;
+  padding: 16px;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s var(--transition-smooth),
+              opacity 0.2s var(--transition-smooth);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.btn:active {
+  transform: scale(0.96);
 }
 
 .btn-cancel {
-    background: var(--glass-bg);
-    color: var(--text-secondary);
-}
-
-.btn-cancel:active {
-    background: var(--glass-bg-light);
+  background: var(--ios-bg);
+  color: var(--ios-text);
 }
 
 .btn-ok {
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-    color: white;
+  background: var(--ios-primary);
+  color: white;
 }
 
 .btn-ok:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-ok:not(:disabled):active {
-    transform: scale(0.98);
+  background: #0056CC;
 }
 
-/* Экран гиперпространства */
-.hyperspace-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(180deg, #0a0a1a 0%, #1a1a3e 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    overflow: hidden;
+/* ===================================
+   Loading Overlay
+   =================================== */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s var(--transition-smooth),
+              visibility 0.3s var(--transition-smooth);
 }
 
-.hyperspace-overlay.active {
-    opacity: 1;
-    visibility: visible;
+.loading-overlay.active {
+  opacity: 1;
+  visibility: visible;
 }
 
-.stars {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
-.star {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: white;
-    border-radius: 50%;
-    animation: hyperspace 2s linear infinite;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-@keyframes hyperspace {
-    0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(100vh) scale(0.5);
-        opacity: 0;
-    }
+.loading-text {
+  margin-top: 20px;
+  color: white;
+  font-size: 17px;
+  font-weight: 500;
 }
 
-.transfer-content {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-}
-
-.pulse-ring {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 3px solid var(--accent-primary);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation: pulse 1.5s ease-out infinite;
-}
-
-.pulse-ring::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 3px solid var(--accent-secondary);
-    animation: pulse 1.5s ease-out infinite 0.5s;
-}
-
-@keyframes pulse {
-    0% {
-        width: 0;
-        height: 0;
-        opacity: 1;
-    }
-    100% {
-        width: 200px;
-        height: 200px;
-        opacity: 0;
-    }
-}
-
-.transfer-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: var(--glass-bg-light);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    animation: float 3s ease-in-out infinite;
-    color: var(--accent-primary);
-}
-
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
-.transfer-text {
-    font-size: 18px;
-    color: var(--text-primary);
-    font-weight: 500;
-    letter-spacing: 0.5px;
-}
-
-/* Адаптивность для разных размеров iPhone */
+/* ===================================
+   Адаптивность для разных размеров iPhone
+   =================================== */
 @media (max-width: 375px) {
-    .cards-container {
-        width: 280px;
-        height: 175px;
-    }
+  .token-card {
+    border-radius: 12px;
+    padding: 12px;
+  }
+  
+  .token-card .bank-name {
+    font-size: 12px;
+  }
+  
+  .token-card .card-number {
+    font-size: 10px;
+  }
+  
+  .big-card {
+    height: 180px;
+  }
+  
+  .big-card-number {
+    font-size: 18px;
+  }
 }
 
 @media (min-width: 414px) {
-    .cards-container {
-        width: 350px;
-        height: 220px;
-    }
+  .cards-grid {
+    gap: 16px;
+  }
+  
+  .token-card {
+    padding: 20px;
+  }
 }
 
-/* Блокировка горизонтальной ориентации */
-@media (orientation: landscape) {
-    .landscape-warning {
-        display: flex;
-    }
-}
-
-.landscape-warning {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--bg-primary);
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 40px;
-    z-index: 9999;
-}
-
-.landscape-warning p {
-    font-size: 18px;
-    color: var(--text-secondary);
+/* ===================================
+   Поддержка темной темы (опционально)
+   =================================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ios-bg: #000000;
+    --ios-card-bg: #1C1C1E;
+    --ios-text: #FFFFFF;
+    --ios-text-secondary: #98989D;
+    --ios-separator: #38383A;
+    --glass-bg: rgba(28, 28, 30, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
+  
+  .input-field {
+    background: #2C2C2E;
+  }
+  
+  .input-field:focus {
+    background: #1C1C1E;
+  }
+  
+  .btn-cancel {
+    background: #2C2C2E;
+    color: white;
+  }
 }

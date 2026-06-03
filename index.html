@@ -1,171 +1,174 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="PNN Wallet">
-    <meta name="theme-color" content="#f5f5f7">
-    <meta name="description" content="PNN Wallet - Управление картами">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png">
-    
-    <title>PNN Wallet</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PNN Wallet">
+  <meta name="theme-color" content="#1C1C1E">
+  <meta name="description" content="Мобильное приложение для управления банковскими токенами">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- iOS иконки -->
+  <link rel="apple-touch-icon" href="assets/icon-192.svg">
+  <link rel="icon" type="image/svg+xml" href="assets/icon-192.svg">
+  <link rel="icon" type="image/svg+xml" sizes="512x512" href="assets/icon-512.svg">
+  
+  <title>PNN Wallet</title>
+  
+  <!-- Стили -->
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div id="app">
-        <!-- Главный экран -->
-        <main class="main-screen">
-            <!-- Логотип -->
-            <header class="header">
-                <div class="logo-container">
-                    <svg class="logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
-                        <circle cx="60" cy="60" r="55" fill="url(#logoGradient)" opacity="0.9"/>
-                        <path d="M35 65 L50 65 L55 50 L60 65 L65 50 L70 65 L85 65 L85 75 L75 75 L70 90 L65 75 L60 90 L55 75 L50 90 L45 75 L35 75 Z" fill="white"/>
-                    </svg>
-                    <h1 class="app-title">PNN Wallet</h1>
-                </div>
-            </header>
-            
-            <!-- Кнопка добавления карты -->
-            <button class="add-card-btn" id="addCardBtn" aria-label="Добавить карту">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-            </button>
-            
-            <!-- Список карт -->
-            <section class="cards-section">
-                <h2 class="section-title">Мои карты</h2>
-                <div class="cards-container" id="cardsContainer">
-                    <!-- Карточки будут добавлены через JS -->
-                </div>
-                
-                <!-- Пустое состояние -->
-                <div class="empty-state" id="emptyState">
-                    <svg class="empty-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="10" y="20" width="60" height="40" rx="8" stroke="#c7c7cc" stroke-width="2" stroke-dasharray="4 4"/>
-                        <path d="M40 35V45M35 40H45" stroke="#c7c7cc" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    <p class="empty-text">Нет добавленных карт</p>
-                    <p class="empty-subtext">Нажмите + чтобы добавить первую карту</p>
-                </div>
-            </section>
-        </main>
-        
-        <!-- Модальное окно добавления карты -->
-        <div class="modal-overlay" id="modalOverlay">
-            <div class="modal-container" id="modalContainer">
-                <div class="modal-handle"></div>
-                
-                <div class="modal-header">
-                    <h2 class="modal-title">Новая карта</h2>
-                    <button class="modal-close" id="modalClose" aria-label="Закрыть">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 6L18 18M6 18L18 6" stroke="#8e8e93" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                </div>
-                
-                <form class="card-form" id="cardForm">
-                    <div class="form-group">
-                        <label class="form-label" for="cardNumber">Номер карты</label>
-                        <div class="input-wrapper">
-                            <input 
-                                type="tel" 
-                                id="cardNumber" 
-                                class="form-input" 
-                                placeholder="0000 0000 0000 0000"
-                                maxlength="19"
-                                autocomplete="cc-number"
-                                inputmode="numeric"
-                            >
-                            <div class="card-icons" id="cardIcons">
-                                <!-- Иконки платёжных систем -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" for="expiryDate">Срок действия</label>
-                            <input 
-                                type="tel" 
-                                id="expiryDate" 
-                                class="form-input" 
-                                placeholder="MM/YY"
-                                maxlength="5"
-                                autocomplete="cc-exp"
-                                inputmode="numeric"
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="cvv">CVV</label>
-                            <div class="cvv-wrapper">
-                                <input 
-                                    type="password" 
-                                    id="cvv" 
-                                    class="form-input" 
-                                    placeholder="123"
-                                    maxlength="4"
-                                    autocomplete="cc-csc"
-                                    inputmode="numeric"
-                                >
-                                <button type="button" class="cvv-info" id="cvvInfo" aria-label="Что такое CVV">
-                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="12" cy="12" r="10" stroke="#8e8e93" stroke-width="1.5"/>
-                                        <path d="M12 16V14M12 10H12.01" stroke="#8e8e93" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="cardholderName">Держатель карты</label>
-                        <input 
-                            type="text" 
-                            id="cardholderName" 
-                            class="form-input" 
-                            placeholder="IVAN IVANOV"
-                            autocomplete="cc-name"
-                            autocapitalize="characters"
-                        >
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn-cancel" id="btnCancel">Отмена</button>
-                        <button type="submit" class="btn-submit" id="btnSubmit">
-                            <span>Добавить</span>
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 18L15 12L9 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    </div>
-                </form>
+  <!-- Основной контейнер -->
+  <div id="app">
+    
+    <!-- Header -->
+    <header class="header">
+      <button class="header-btn profile-btn" id="profileBtn" aria-label="Профиль">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 14C8 14 4 16 4 20V21H20V20C20 16 16 14 12 14Z" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+      
+      <div class="logo">
+        <img src="assets/icon-192.svg" alt="PNN Wallet" class="logo-img" id="logoImg">
+      </div>
+      
+      <button class="header-btn add-btn" id="addCardBtn" aria-label="Добавить карту">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+    
+    <!-- Основной контент -->
+    <main class="main-content">
+      
+      <!-- Секция с карточками токенов -->
+      <section class="cards-section">
+        <div class="cards-grid" id="cardsGrid">
+          <!-- Карточки будут добавлены динамически -->
+        </div>
+      </section>
+      
+      <!-- Большая нижняя карта -->
+      <section class="big-card-section">
+        <div class="big-card-container" id="bigCardContainer">
+          <div class="big-card" id="bigCard">
+            <div class="big-card-content">
+              <div class="big-card-chip"></div>
+              <div class="big-card-number">•••• •••• •••• 0000</div>
+              <div class="big-card-info">
+                <span class="big-card-label">Cardholder</span>
+                <span class="big-card-value">CARD HOLDER</span>
+              </div>
             </div>
+            <div class="big-card-overlay" id="bigCardOverlay">
+              <canvas id="flightCanvas"></canvas>
+              <button class="cancel-btn" id="cancelPaymentBtn">ОТМЕНА</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+    </main>
+    
+    <!-- Навигационная панель -->
+    <nav class="tab-bar">
+      <button class="tab-btn active" data-tab="main" aria-label="Основное">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" stroke-width="2"/>
+          <line x1="2" y1="9" x2="22" y2="9" stroke="currentColor" stroke-width="2"/>
+          <line x1="7" y1="14" x2="11" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="tab-btn" data-tab="history" aria-label="История">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 7V12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </nav>
+    
+    <!-- Модальное окно добавления карты -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-card" id="modalCard">
+        <div class="modal-header">
+          <h2 class="modal-title">Новая карта</h2>
+          <button class="star-btn" id="starBtn" aria-label="Сделать основной">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path class="star-outline" d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </div>
         
-        <!-- Подсказка CVV -->
-        <div class="cvv-tooltip" id="cvvTooltip">
-            <p>CVV-код — это 3-значный номер на обратной стороне карты</p>
+        <div class="modal-body">
+          <div class="input-group">
+            <label class="input-label">Номер карты</label>
+            <input 
+              type="tel" 
+              class="input-field" 
+              id="cardNumber" 
+              placeholder="0000 0000 0000 0000"
+              maxlength="19"
+              inputmode="numeric"
+              autocomplete="cc-number"
+            >
+          </div>
+          
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label">Срок действия</label>
+              <input 
+                type="tel" 
+                class="input-field" 
+                id="expiryDate" 
+                placeholder="MM/YY"
+                maxlength="5"
+                inputmode="numeric"
+                autocomplete="cc-exp"
+              >
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">CVV</label>
+              <input 
+                type="password" 
+                class="input-field" 
+                id="cvv" 
+                placeholder="•••"
+                maxlength="3"
+                inputmode="numeric"
+                autocomplete="cc-csc"
+              >
+            </div>
+          </div>
         </div>
+        
+        <div class="modal-footer">
+          <button class="btn btn-cancel" id="cancelBtn">Отмена</button>
+          <button class="btn btn-ok" id="okBtn" disabled>OK</button>
+        </div>
+      </div>
     </div>
     
-    <script src="app.js"></script>
+    <!-- Экран загрузки токенизации -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Токенизация карты...</p>
+    </div>
+    
+  </div>
+  
+  <!-- Скрипты -->
+  <script src="js/utils.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

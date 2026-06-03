@@ -1,52 +1,28 @@
 {
-    "name": "PNN Wallet",
-    "short_name": "PNN Wallet",
-    "description": "Управление банковскими картами",
-    "start_url": "/index.html",
-    "display": "standalone",
-    "orientation": "portrait",
-    "background_color": "#f5f5f7",
-    "theme_color": "#f5f5f7",
-    "status_bar": "black-translucent",
-    "icons": [
-        {
-            "src": "assets/icons/icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "assets/icons/icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "assets/icons/apple-touch-icon.png",
-            "sizes": "180x180",
-            "type": "image/png",
-            "purpose": "any"
-        }
-    ],
-    "categories": ["finance", "utilities"],
-    "lang": "ru",
-    "dir": "ltr",
-    "prefer_related_applications": false,
-    "ios": {
-        "supports_family": true,
-        "bundle_id": "com.pnn.wallet",
-        "app_store_id": ""
+  "name": "PNN Token Wallet",
+  "short_name": "PNN Wallet",
+  "description": "Мобильное приложение для управления банковскими токенами",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#F2F2F7",
+  "theme_color": "#1C1C1E",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "assets/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
-    "screenshots": [],
-    "shortcuts": [],
-    "share_target": {
-        "action": "/share",
-        "method": "POST",
-        "enctype": "multipart/form-data",
-        "params": {
-            "title": "title",
-            "text": "text",
-            "url": "url"
-        }
+    {
+      "src": "assets/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
+  ],
+  "categories": ["finance", "utilities"],
+  "lang": "ru-RU",
+  "dir": "ltr"
 }

@@ -1,278 +1,349 @@
 /**
- * Main Application Module - инициализация и координация компонентов
+ * PNN Wallet - Основное приложение
  */
 
+import { CardManager, CardForm, CardRenderer } from './cards.js';
+import { FlightEffect, LoadingAnimations } from './animations.js';
+import { sleep } from './utils.js';
+
+/**
+ * Главный класс приложения
+ */
 class App {
-    constructor() {
-        this.modalOverlay = document.getElementById('modalOverlay');
-        this.modalCard = document.getElementById('modalCard');
-        this.hyperspaceOverlay = document.getElementById('hyperspaceOverlay');
-        
-        // Элементы формы
-        this.addCardForm = document.getElementById('addCardForm');
-        this.cardNumberInput = document.getElementById('cardNumber');
-        this.expiryDateInput = document.getElementById('expiryDate');
-        this.cvvInput = document.getElementById('cvv');
-        this.cardholderNameInput = document.getElementById('cardholderName');
-        this.starBtn = document.getElementById('starBtn');
-        this.okBtn = document.getElementById('okBtn');
-        this.cancelBtn = document.getElementById('cancelBtn');
-        
-        // Кнопки навигации
-        this.addCardBtn = document.getElementById('addCardBtn');
-        this.avatarBtn = document.getElementById('avatar');
-        this.tabBtns = document.querySelectorAll('.tab-btn');
-        
-        // Состояние
-        this.isStarActive = false;
-        this.formValid = false;
-        
-        this.init();
-    }
+  constructor() {
+    // Менеджеры
+    this.cardManager = new CardManager();
+    this.cardRenderer = new CardRenderer('cardsGrid');
+    
+    // Эффекты
+    this.flightEffect = new FlightEffect('flightCanvas');
+    
+    // Состояние
+    this.isPaymentMode = false;
+    this.currentCard = null;
+    
+    // Элементы UI
+    this.elements = {
+      addCardBtn: document.getElementById('addCardBtn'),
+      profileBtn: document.getElementById('profileBtn'),
+      bigCard: document.getElementById('bigCard'),
+      bigCardOverlay: document.getElementById('bigCardOverlay'),
+      cancelPaymentBtn: document.getElementById('cancelPaymentBtn'),
+      modalOverlay: document.getElementById('modalOverlay'),
+      loadingOverlay: document.getElementById('loadingOverlay'),
+      tabBtns: document.querySelectorAll('.tab-btn')
+    };
 
-    async init() {
-        // Регистрация Service Worker
-        await this.registerServiceWorker();
-        
-        // Настройка обработчиков событий
-        this.setupEventListeners();
-        
-        // Инициализация компонентов
-        this.setupFormValidation();
-        
-        console.log('PNN App initialized');
-    }
+    // Инициализация
+    this.init();
+  }
 
-    /**
-     * Регистрация Service Worker для PWA
-     */
-    async registerServiceWorker() {
-        if ('serviceWorker' in navigator) {
-            try {
-                const registration = await navigator.serviceWorker.register('/sw.js', {
-                    scope: '/'
-                });
-                console.log('Service Worker зарегистрирован:', registration.scope);
-            } catch (error) {
-                console.error('Ошибка регистрации Service Worker:', error);
-            }
-        }
-    }
+  /**
+   * Инициализация приложения
+   */
+  async init() {
+    // Регистрация Service Worker
+    await this.registerServiceWorker();
+    
+    // Инициализация формы добавления карты
+    this.initCardForm();
+    
+    // Настройка обработчиков событий
+    this.initEventListeners();
+    
+    // Добавление демо-карт
+    this.addDemoCards();
+    
+    console.log('PNN Wallet initialized');
+  }
 
-    /**
-     * Настройка обработчиков событий
-     */
-    setupEventListeners() {
-        // Открытие модального окна добавления карты
-        this.addCardBtn.addEventListener('click', () => this.openModal());
-        
-        // Закрытие модального окна
-        this.cancelBtn.addEventListener('click', () => this.closeModal());
-        this.modalOverlay.addEventListener('click', (e) => {
-            if (e.target === this.modalOverlay) {
-                this.closeModal();
-            }
+  /**
+   * Регистрация Service Worker
+   */
+  async registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.register('/sw.js', {
+          scope: '/'
         });
-        
-        // Кнопка звезды
-        this.starBtn.addEventListener('click', () => this.toggleStar());
-        
-        // Отправка формы
-        this.addCardForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.submitForm();
-        });
-        
-        // Навигация по табам
-        this.tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
-        });
-        
-        // Аватарка (заглушка личного кабинета)
-        this.avatarBtn.addEventListener('click', () => {
-            alert('Личный кабинет - заглушка MVP');
-        });
-        
-        // Обработчик смахивания карты
-        document.addEventListener('cardSwipeRight', (e) => {
-            this.handleCardSwipe(e.detail.cardId);
-        });
+        console.log('Service Worker registered:', registration.scope);
+      } catch (error) {
+        console.error('Service Worker registration failed:', error);
+      }
     }
+  }
 
-    /**
-     * Настройка валидации формы
-     */
-    setupFormValidation() {
-        // Форматирование номера карты
-        this.cardNumberInput.addEventListener('input', (e) => {
-            const formatted = cardsManager.formatCardNumber(e.target.value);
-            e.target.value = formatted;
-            this.validateForm();
-        });
-        
-        // Форматирование срока действия
-        this.expiryDateInput.addEventListener('input', (e) => {
-            const formatted = cardsManager.formatExpiryDate(e.target.value);
-            e.target.value = formatted;
-            this.validateForm();
-        });
-        
-        // Только цифры для CVV
-        this.cvvInput.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/\D/g, '');
-            this.validateForm();
-        });
-        
-        // Валидация имени
-        this.cardholderNameInput.addEventListener('input', (e) => {
-            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z\s]/g, '');
-            this.validateForm();
-        });
-    }
+  /**
+   * Инициализация формы добавления карты
+   */
+  initCardForm() {
+    this.cardForm = new CardForm(
+      (formData, isMain) => this.handleCardSubmit(formData, isMain),
+      () => console.log('Form cancelled')
+    );
+  }
 
-    /**
-     * Валидация формы
-     */
-    validateForm() {
-        const cardNumber = this.cardNumberInput.value.replace(/\s/g, '');
-        const expiry = this.expiryDateInput.value;
-        const cvv = this.cvvInput.value;
-        
-        // Проверка номера карты (16-19 цифр)
-        const isCardNumberValid = /^\d{16,19}$/.test(cardNumber);
-        
-        // Проверка принадлежности к "Мир"
-        const isMir = cardsManager.isMirCard(cardNumber);
-        this.cardNumberInput.classList.toggle('error', !isMir && cardNumber.length >= 4);
-        
-        // Проверка срока действия
-        const isExpiryValid = cardsManager.isValidExpiry(expiry);
-        
-        // CVV (необязательно в MVP, но рекомендуется)
-        const isCvvValid = cvv.length === 3;
-        
-        // Имя держателя (необязательно)
-        const hasHolder = this.cardholderNameInput.value.trim().length > 0;
-        
-        // Общая валидация
-        this.formValid = isCardNumberValid && isMir && isExpiryValid && isCvvValid;
-        this.okBtn.disabled = !this.formValid;
-        
-        return this.formValid;
-    }
+  /**
+   * Настройка обработчиков событий
+   */
+  initEventListeners() {
+    // Кнопка добавления карты
+    this.elements.addCardBtn.addEventListener('click', () => {
+      this.cardForm.show();
+    });
 
-    /**
-     * Переключение звезды (основная карта)
-     */
-    toggleStar() {
-        this.isStarActive = !this.isStarActive;
-        this.starBtn.classList.toggle('active', this.isStarActive);
-    }
+    // Кнопка профиля (заглушка)
+    this.elements.profileBtn.addEventListener('click', () => {
+      console.log('Profile button clicked');
+      // TODO: Реализовать переход в профиль
+    });
 
-    /**
-     * Открытие модального окна
-     */
-    async openModal() {
-        await animationManager.showModal(this.modalOverlay);
-        
-        // Сброс формы
-        this.addCardForm.reset();
-        this.isStarActive = false;
-        this.starBtn.classList.remove('active');
-        this.formValid = false;
-        this.okBtn.disabled = true;
-        this.cardNumberInput.classList.remove('error');
-    }
+    // Большая карта - swipe жесты
+    this.initSwipeGestures();
 
-    /**
-     * Закрытие модального окна
-     */
-    async closeModal() {
-        await animationManager.hideModal(this.modalOverlay);
-    }
+    // Кнопка отмены оплаты
+    this.elements.cancelPaymentBtn.addEventListener('click', () => {
+      this.exitPaymentMode();
+    });
 
-    /**
-     * Отправка формы (добавление карты)
-     */
-    async submitForm() {
-        if (!this.formValid) return;
-        
-        const cardData = {
-            number: this.cardNumberInput.value.replace(/\s/g, ''),
-            expiry: this.expiryDateInput.value,
-            cvv: this.cvvInput.value,
-            holder: this.cardholderNameInput.value.trim() || 'CARDHOLDER',
-            isPrimary: this.isStarActive
-        };
-        
-        try {
-            // Добавление карты
-            const newCard = await cardsManager.addCard(cardData);
-            console.log('Карта добавлена:', newCard);
-            
-            // Закрытие модального окна
-            await this.closeModal();
-            
-            // Анимация успешного добавления
-            animationManager.pulseAnimation(this.addCardBtn);
-            
-        } catch (error) {
-            console.error('Ошибка добавления карты:', error);
-            alert('Ошибка добавления карты. Попробуйте снова.');
-        }
-    }
+    // Вкладки навигации
+    this.elements.tabBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.handleTabSwitch(e.currentTarget);
+      });
+    });
 
-    /**
-     * Обработка смахивания карты (передача токена)
-     */
-    async handleCardSwipe(cardId) {
-        const card = cardsManager.cards.find(c => c.id === cardId);
-        if (!card) return;
-        
-        console.log('Смахивание карты:', cardId);
-        
-        try {
-            // Запуск анимации гиперпространства
-            await animationManager.startHyperspace();
-            
-            // Симуляция BLE передачи токена
-            const transferSuccess = await bleService.simulateTokenTransfer(card.token);
-            
-            if (transferSuccess) {
-                console.log('Токен успешно передан');
-            }
-            
-            // Завершение анимации
-            await animationManager.endHyperspace();
-            
-        } catch (error) {
-            console.error('Ошибка передачи токена:', error);
-            await animationManager.endHyperspace();
-        }
-    }
+    // Обработка жестов клавиатуры на iOS
+    this.handleIOSKeyboard();
+  }
 
-    /**
-     * Переключение вкладок
-     */
-    switchTab(tabName) {
-        this.tabBtns.forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.tab === tabName);
-        });
-        
-        if (tabName === 'history') {
-            // Заглушка для истории
-            alert('История транзакций - заглушка MVP');
-            // Возврат на главную
-            setTimeout(() => {
-                this.tabBtns.forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.tab === 'home');
-                });
-            }, 500);
-        }
+  /**
+   * Инициализация swipe жестов для большой карты
+   */
+  initSwipeGestures() {
+    let startX = 0;
+    let currentX = 0;
+    let isSwiping = false;
+    const threshold = 100; // Минимальное расстояние для swipe
+
+    const bigCard = this.elements.bigCard;
+
+    // Touch start
+    bigCard.addEventListener('touchstart', (e) => {
+      if (this.isPaymentMode) return;
+      
+      startX = e.touches[0].clientX;
+      isSwiping = true;
+    }, { passive: true });
+
+    // Touch move
+    bigCard.addEventListener('touchmove', (e) => {
+      if (!isSwiping || this.isPaymentMode) return;
+      
+      currentX = e.touches[0].clientX;
+      const diff = currentX - startX;
+      
+      // Только свайп влево
+      if (diff < 0) {
+        const opacity = Math.min(Math.abs(diff) / threshold, 1);
+        this.elements.bigCardOverlay.style.opacity = opacity;
+      }
+    }, { passive: true });
+
+    // Touch end
+    bigCard.addEventListener('touchend', (e) => {
+      if (!isSwiping || this.isPaymentMode) return;
+      
+      const diff = currentX - startX;
+      
+      if (diff < -threshold) {
+        // Свайп влево - активация оплаты
+        this.enterPaymentMode();
+      } else {
+        // Возврат в исходное положение
+        this.elements.bigCardOverlay.style.opacity = '0';
+      }
+      
+      isSwiping = false;
+      currentX = 0;
+    }, { passive: true });
+
+    // Mouse events для десктопного тестирования
+    bigCard.addEventListener('mousedown', (e) => {
+      if (this.isPaymentMode) return;
+      startX = e.clientX;
+      isSwiping = true;
+    });
+
+    bigCard.addEventListener('mousemove', (e) => {
+      if (!isSwiping || this.isPaymentMode) return;
+      
+      currentX = e.clientX;
+      const diff = currentX - startX;
+      
+      if (diff < 0) {
+        const opacity = Math.min(Math.abs(diff) / threshold, 1);
+        this.elements.bigCardOverlay.style.opacity = opacity;
+      }
+    });
+
+    bigCard.addEventListener('mouseup', (e) => {
+      if (!isSwiping || this.isPaymentMode) return;
+      
+      const diff = currentX - startX;
+      
+      if (diff < -threshold) {
+        this.enterPaymentMode();
+      } else {
+        this.elements.bigCardOverlay.style.opacity = '0';
+      }
+      
+      isSwiping = false;
+      currentX = 0;
+    });
+
+    bigCard.addEventListener('mouseleave', () => {
+      if (!isSwiping || this.isPaymentMode) return;
+      this.elements.bigCardOverlay.style.opacity = '0';
+      isSwiping = false;
+    });
+  }
+
+  /**
+   * Вход в режим оплаты
+   */
+  enterPaymentMode() {
+    if (this.isPaymentMode) return;
+    
+    this.isPaymentMode = true;
+    this.elements.bigCardOverlay.classList.add('active');
+    
+    // Запуск эффекта полета
+    this.flightEffect.start();
+  }
+
+  /**
+   * Выход из режима оплаты
+   */
+  async exitPaymentMode() {
+    if (!this.isPaymentMode) return;
+    
+    // Анимация "схлопывания" (обратный эффект)
+    this.flightEffect.stop(true);
+    this.elements.bigCardOverlay.classList.remove('active');
+    
+    await sleep(300);
+    this.isPaymentMode = false;
+  }
+
+  /**
+   * Обработка отправки формы карты
+   * @param {Object} formData - Данные формы
+   * @param {boolean} isMain - Флаг основной карты
+   */
+  async handleCardSubmit(formData, isMain) {
+    // Добавляем карту
+    const card = this.cardManager.addCard({
+      ...formData,
+      isMain
+    });
+
+    // Рендерим карту
+    this.cardRenderer.addCard(card);
+
+    // Показываем индикатор загрузки
+    await LoadingAnimations.show(this.elements.loadingOverlay);
+
+    // Имитация токенизации (2 секунды)
+    await sleep(2000);
+
+    // Скрываем индикатор загрузки
+    await LoadingAnimations.hide(this.elements.loadingOverlay);
+
+    console.log('Card added:', card);
+  }
+
+  /**
+   * Переключение вкладок
+   * @param {HTMLElement} tab - Элемент вкладки
+   */
+  handleTabSwitch(tab) {
+    const tabName = tab.getAttribute('data-tab');
+
+    // Обновляем активный класс
+    this.elements.tabBtns.forEach(btn => {
+      btn.classList.toggle('active', btn === tab);
+    });
+
+    console.log('Tab switched:', tabName);
+
+    // TODO: Реализовать переключение контента
+    if (tabName === 'history') {
+      // Переход на страницу истории
+      // window.location.href = 'pages/history.html';
     }
+  }
+
+  /**
+   * Добавление демо-карт для демонстрации
+   */
+  addDemoCards() {
+    const demoCards = [
+      {
+        id: '1',
+        number: '4000 1234 5678 9010',
+        expiryDate: '12/25',
+        color: 'yellow',
+        isMain: true
+      },
+      {
+        id: '2',
+        number: '5500 1234 5678 9012',
+        expiryDate: '06/26',
+        color: 'red',
+        isMain: false
+      },
+      {
+        id: '3',
+        number: '3400 1234 5678 901',
+        expiryDate: '03/27',
+        color: 'blue',
+        isMain: false
+      },
+      {
+        id: '4',
+        number: '6011 1234 5678 9012',
+        expiryDate: '09/25',
+        color: 'green',
+        isMain: false
+      }
+    ];
+
+    demoCards.forEach(card => {
+      this.cardManager.cards.push(card);
+      this.cardRenderer.addCard(card);
+    });
+
+    // Устанавливаем основную карту
+    this.cardManager.setMainCard('1');
+  }
+
+  /**
+   * Обработка клавиатуры на iOS
+   */
+  handleIOSKeyboard() {
+    // Предотвращаем зум при фокусе на input
+    document.addEventListener('focusin', (e) => {
+      if (e.target.tagName === 'INPUT') {
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 100);
+      }
+    });
+  }
 }
 
 // Инициализация приложения после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
-    window.app = new App();
+  window.app = new App();
 });
